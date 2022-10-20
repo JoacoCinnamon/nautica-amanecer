@@ -21,10 +21,10 @@
   <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 
   <!-- favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="./img/favicon-16x16.png">
-  <link rel="manifest" href="./site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="./public/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./public/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./public/favicon-16x16.png">
+  <link rel="manifest" href="./public/site.webmanifest">
 
   <title>Náutica Amanecer</title>
 </head>
@@ -35,7 +35,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light border-2 border-bottom border-secondary">
       <!-- También fluid -->
       <div class="container">
-        <a class="navbar-brand" aria-current="page" href="/Nautica_Amanecer/"> <img src="logo.png" alt="Logo" width="150px" class="d-inline-block align-text-top">
+        <a class="navbar-brand" aria-current="page" href="/Nautica_Amanecer/"> <img src="./public/logo.png" alt="Logo" width="150px" class="d-inline-block align-text-top">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>

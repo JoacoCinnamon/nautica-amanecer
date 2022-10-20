@@ -46,6 +46,7 @@ class Embarcacion
             echo "ERROR: " . $e->getMessage();
         }
     }
+
     public static function selectAllEmbarcaciones()
     {
         try {
@@ -56,6 +57,43 @@ class Embarcacion
         } catch (PDOException $e) {
             echo "ERROR: " . $e->getMessage();
         }
+    }
+
+    public function insertEmbarcacion()
+    {
+        try {
+            if ($this->seRepiteRey()) {
+                $reyRepetido = $this->rey;
+                return $reyRepetido;
+            }
+            $sentencia = "INSERT INTO `embarcaciones` (`nombre`, `rey`, `id_cliente`, `estado`) VALUES (?,?,?,?)";
+            $insert = Conexion::getConexion()->prepare($sentencia);
+            // El 1 en estado es porque está activo
+            $datos = array($this->nombre, $this->rey, $this->id_cliente, 1);
+            $insert = $insert->execute($datos);
+            $this->id = Conexion::getConexion()->lastInsertId();
+
+            // return $this->id;
+            return "Se ha ingresado correctamente a $this->nombre";
+        } catch (PDOException $e) {
+            echo "ERROR: " . $e->getMessage();
+        }
+    }
+
+    private function seRepiteRey()
+    {
+        $embarcaciones = $this->selectAllEmbarcaciones();
+        $index = 0;
+        $cantEmbarcaciones = count($embarcaciones);
+        $seRepite = false;
+        while ($index < $cantEmbarcaciones && !$seRepite) {
+            if ($this->rey === $embarcaciones[$index]->rey) {
+                $seRepite = $embarcaciones[$index]->nombre;
+            }
+            $index++;
+        }
+
+        return $seRepite;
     }
 
     /**
