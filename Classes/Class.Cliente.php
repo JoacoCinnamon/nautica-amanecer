@@ -28,8 +28,6 @@ class Cliente
   {
     try {
 
-      // Cuándo no lo puedo dar de baja??? Cuándo no hay embarcaciones a su nombre?
-
       $sentencia = "UPDATE `clientes` SET `estado` = (?) WHERE id = (?)";
       $delete = Conexion::getConexion()->prepare($sentencia);
       $datos = array($this->estado, $this->id);
@@ -41,20 +39,21 @@ class Cliente
     }
   }
 
+
+  /**
+   * SE DEBEN DAR DE BAJA LAS EMBARCACIONES TAMBIÉN Y DESOCUPAR LAS RESPECTIVAS AMARRAS
+   */
   public function updateCliente()
   {
     try {
-
       if ($this->seRepiteDni()) {
         $dniRepetido = $this->dni;
         return $dniRepetido;
       }
-      // La idea es que lo pueda dar de baja desde acá?
-      $sentencia = "UPDATE `clientes` 
-      SET `apellido_nombre`= (?),`dni`= (?),`domicilio`= (?),`movil`= (?),`email`= (?),`estado`= (?) 
-      WHERE id = $this->id";
+      $sentencia = "UPDATE clientes SET `apellido_nombre`= (?), `email`= (?), `dni` = (?), `movil` = (?), `domicilio` = (?), `estado` = (?)  
+      WHERE id = (?)";
       $update = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->apellido_nombre, $this->dni, $this->domicilio, $this->movil, $this->email, $this->estado);
+      $datos = array($this->apellido_nombre, $this->email, $this->dni, $this->movil, $this->domicilio, $this->estado, $this->id);
       $update = $update->execute($datos);
 
       return $update;
@@ -63,10 +62,10 @@ class Cliente
     }
   }
 
-  public function selectClienteById()
+  public static function selectClienteById($id)
   {
     try {
-      $sentencia = "SELECT * FROM `clientes` WHERE id = $this->id";
+      $sentencia = "SELECT * FROM `clientes` WHERE id = $id";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
@@ -100,7 +99,7 @@ class Cliente
     }
   }
 
-  public function selectAllClientes()
+  public static function selectAllClientes()
   {
     try {
       $sentencia = "SELECT * FROM `clientes` ORDER BY id";
@@ -141,7 +140,7 @@ class Cliente
     $seRepite = false;
     while ($index < $cantClientes && !$seRepite) {
       if ($this->dni === $clientes[$index]->dni) {
-        $seRepite = $clientes[$index]->nombre;
+        $seRepite = $clientes[$index]->apellido_nombre;
       }
       $index++;
     }

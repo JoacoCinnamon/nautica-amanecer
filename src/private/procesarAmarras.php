@@ -46,8 +46,8 @@ if (isset($_POST["botonAmarras"]) && $seTipeoUnPasillo) {
 }
 
 if ($seSeleccionoAmarra) {
-  $amarra = new Amarra($_POST["idAmarra"], 0, 0);
-  $amarra = $amarra->selectAmarraById();
+  $amarra = Amarra::selectAmarraById($_POST["idAmarra"]);
+  # Si existe
   if ($amarra) {
     $id = $amarra->id;
     $pasillo = $amarra->pasillo;

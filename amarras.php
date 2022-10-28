@@ -51,8 +51,7 @@
             <select class="form-select" id="inputGroupSelect04" name="idAmarra">
               <option value="0">Lista de amarras</option>
               <?php
-              $amarra = new Amarra($id, $pasillo, $estado);
-              $amarras = $amarra->selectAllAmarras();
+              $amarras = Amarra::selectAllAmarras();
               foreach ($amarras as $amarraActual) {
                 ($amarraActual->estado == 0)
                   ? $estadoString = " (Libre)"

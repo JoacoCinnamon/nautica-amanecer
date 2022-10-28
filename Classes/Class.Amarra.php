@@ -18,10 +18,6 @@ class Amarra
   public function deleteAmarra()
   {
     try {
-
-      // Tiene que poder borrar de la base de datos amarras? 
-      // Porque no tiene un estado de activa o inactiva, sino un estado fisico de si está ocupada o no
-
       return false;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
@@ -47,10 +43,10 @@ class Amarra
     }
   }
 
-  public function selectAmarraById()
+  public static function selectAmarraById($id)
   {
     try {
-      $sentencia = "SELECT * FROM `amarras` WHERE id = $this->id";
+      $sentencia = "SELECT * FROM `amarras` WHERE id = $id";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
@@ -59,10 +55,10 @@ class Amarra
     }
   }
 
-  public function selectAmarrasByPasillo()
+  public static function selectAmarrasByPasillo($pasillo)
   {
     try {
-      $sentencia = "SELECT * FROM `amarras` WHERE `pasillo` = $this->pasillo";
+      $sentencia = "SELECT * FROM `amarras` WHERE `pasillo` = $pasillo";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
@@ -71,7 +67,7 @@ class Amarra
     }
   }
 
-  public function selectAmarrasByEstado($estado)
+  public static function selectAmarrasByEstado($estado)
   {
     try {
       // El estado es un numero pasado por parametro, 0 = libre, 1 = ocupada
@@ -84,7 +80,7 @@ class Amarra
     }
   }
 
-  public function selectAllAmarras()
+  public static function selectAllAmarras()
   {
     try {
       $sentencia = "SELECT * FROM `amarras` ORDER BY pasillo";
