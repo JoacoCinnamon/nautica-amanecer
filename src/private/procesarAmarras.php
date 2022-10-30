@@ -1,10 +1,4 @@
 <?php
-
-// Comento las lineas donde "aplico" el patrón singleton porque
-// no me permitió usarlo como pensé/hubiera querido. En cambio uso de manera abstracta la clase Conexion
-
-//require_once('./Classes/Class.Conexion.php');
-//$conn = Conexion::getConexion();
 require_once('./Classes/Class.Amarra.php');
 
 
@@ -36,13 +30,11 @@ if (isset($_POST["botonAmarras"]) && $seTipeoUnPasillo) {
   } elseif ($_POST["botonAmarras"] == "Editar") {
     $msg = $amarra->updateAmarra();
   } else {
-    // Borrar amarra ?
+    // Borrar amarra ? NO SE PUEDEN BORRAR
   }
   $id = 0;
   $pasillo = 0;
   $estado = 0;
-
-  // Clear the POST Request
 }
 
 if ($seSeleccionoAmarra) {

@@ -4,9 +4,9 @@ require_once('./Classes/Class.Conexion.php');
 
 class Amarra
 {
-  private $id;
-  private $pasillo;
-  private $estado;
+  private int $id;
+  private int $pasillo;
+  private int $estado;
 
   public function __construct($id, $pasillo, $estado)
   {
@@ -15,7 +15,7 @@ class Amarra
     $this->estado = $estado;
   }
 
-  public function deleteAmarra()
+  public function deleteAmarra(): bool
   {
     try {
       return false;
@@ -24,26 +24,35 @@ class Amarra
     }
   }
 
-  public function updateAmarra()
+  /**
+   * Actualiza todo los datos de la amarra en la base de datos
+   * @throws PDOException
+   * @return boolean True si se actualizó, false si no 
+   */
+  public function updateAmarra(): bool
   {
     try {
       $sentencia = "UPDATE `amarras` SET `pasillo` = (?), `estado` = (?) WHERE id = (?)";
       $update = Conexion::getConexion()->prepare($sentencia);
       $datos = array($this->pasillo, $this->estado, $this->id);
       $update = $update->execute($datos);
-      $estado = ($this->estado == 0)
-        ? "libre"
-        : "ocupada";
+      // $estado = ($this->estado == 0)
+      //   ? "libre"
+      //   : "ocupada";
 
-      $message = "Se ha actualizado correctamente la amarra N°$this->id, pasillo $this->pasillo y está $estado";
-
-      return $message;
+      return $update;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }
   }
 
-  public static function selectAmarraById($id)
+  /**
+   * Se obtiene la amarra que coincida con el id pasado por parámetro. 
+   * @param int $id Id de la amarra que queremos buscar
+   * @throws PDOException
+   * @return Amarra Amarra que coincida con el id pasado por parámetro, falso si falla.
+   */
+  public static function selectAmarraById(int $id)
   {
     try {
       $sentencia = "SELECT * FROM `amarras` WHERE id = $id";
@@ -55,7 +64,13 @@ class Amarra
     }
   }
 
-  public static function selectAmarrasByPasillo($pasillo)
+  /**
+   * Se obtiene la amarra que coincida con el pasillo pasado por parámetro. 
+   * @param int $pasillo Pasillos que queremos buscar
+   * @throws PDOException
+   * @return array<Amarra> Array de amarras que coincidan con el pasillo pasado por parámetro, falso si falla.
+   */
+  public static function selectAmarrasByPasillo(int $pasillo): array
   {
     try {
       $sentencia = "SELECT * FROM `amarras` WHERE `pasillo` = $pasillo";
@@ -67,10 +82,15 @@ class Amarra
     }
   }
 
-  public static function selectAmarrasByEstado($estado)
+  /**
+   * @param int<0, 1> $estado El estado de la amarra. 0 = libre 1 = ocupado
+   * @throws PDOException
+   * @return array<Amarra> Array de amarras que coincidan con el estado pasado por parámetro, falso si falla.
+   * Amarras[] == array<Amarra>
+   */
+  public static function selectAmarrasByEstado(int $estado): array
   {
     try {
-      // El estado es un numero pasado por parametro, 0 = libre, 1 = ocupada
       $sentencia = "SELECT * FROM `amarras` WHERE estado = $estado ORDER BY pasillo";
       $select = Conexion::getConexion()->query($sentencia);
 
@@ -80,7 +100,12 @@ class Amarra
     }
   }
 
-  public static function selectAllAmarras()
+  /**
+   * Se obtiene una lista con todas las amarras registrados. 
+   * @throws PDOException
+   * @return array<Amarra> Lista de todas las amarras, falso si falla.
+   */
+  public static function selectAllAmarras(): array
   {
     try {
       $sentencia = "SELECT * FROM `amarras` ORDER BY pasillo";
@@ -92,7 +117,12 @@ class Amarra
     }
   }
 
-  public function insertAmarra()
+  /**
+   * Crea en la base de datos una nueva amarra con los datos del objeto Amarra
+   * @throws PDOException
+   * @return boolean True si se pudo agregar el cliente a la base de datos, false si no se pudo
+   */
+  public function insertAmarra(): bool
   {
     try {
       $sentencia = "INSERT INTO `amarras` (`pasillo`, `estado`) VALUES (?,?)";
@@ -101,8 +131,7 @@ class Amarra
       $insert = $insert->execute($datos);
       $this->id = Conexion::getConexion()->lastInsertId();
 
-      // return $this->id;
-      return "Se ha ingresado correctamente la amarra N°$this->id y pasillo $this->pasillo";
+      return $insert;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }

@@ -2,18 +2,17 @@
 
 require_once('./Classes/Class.Conexion.php');
 
-
 class Cliente
 {
-  private $id;
-  private $apellido_nombre;
-  private $email;
-  private $dni;
-  private $movil;
-  private $domicilio;
-  private $estado;
+  private int $id;
+  private string $apellido_nombre;
+  private string $email;
+  private int $dni;
+  private string $movil;
+  private string $domicilio;
+  private int $estado;
 
-  public function __construct($id, $apellido_nombre, $email, $dni, $movil, $domicilio, $estado)
+  public function __construct(int $id, string $apellido_nombre, string $email, int $dni, string $movil, string $domicilio, int $estado)
   {
     $this->id = $id;
     $this->apellido_nombre = $apellido_nombre;
@@ -24,13 +23,17 @@ class Cliente
     $this->estado = $estado;
   }
 
-  public function deleteCliente()
+  /**
+   * Eliminar unn cliente de la base de datos
+   * @throws PDOException
+   * @return boolean True si se eliminó, false si no se eliminó 
+   */
+  private function deleteCliente(): bool
   {
     try {
-
-      $sentencia = "UPDATE `clientes` SET `estado` = (?) WHERE id = (?)";
+      $sentencia = "DELETE FROM `clientes` WHERE id = (?)";
       $delete = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->estado, $this->id);
+      $datos = array($this->id);
       $delete = $delete->execute($datos);
 
       return $delete;
@@ -39,21 +42,27 @@ class Cliente
     }
   }
 
-
   /**
    * SE DEBEN DAR DE BAJA LAS EMBARCACIONES TAMBIÉN Y DESOCUPAR LAS RESPECTIVAS AMARRAS
    */
   public function updateCliente()
   {
     try {
-      if ($this->seRepiteDni()) {
-        $dniRepetido = $this->dni;
-        return $dniRepetido;
+      $clienteAModificar = Cliente::selectClienteById($this->id);
+      // (Si se repite este DNI en la base de datos PERO (&&) el DNI ingresado NO es del cliente a modificar)
+      if ($this->seRepiteDni() && $this->dni !== $clienteAModificar->dni) return false;
+
+      if ($this->estado == 0) {
+        $embarcacionesBaja = Embarcacion::selectEmbarcacionesByCliente($this->id);
+        foreach ($embarcacionesBaja as $embarcacionActual) {
+          $embarcacionActual->updateEmbarcacion();
+        }
       }
-      $sentencia = "UPDATE clientes SET `apellido_nombre`= (?), `email`= (?), `dni` = (?), `movil` = (?), `domicilio` = (?), `estado` = (?)  
-      WHERE id = (?)";
+
+      $sentencia = "UPDATE `clientes` SET `apellido_nombre` = (?), `email` = (?), `dni` = (?), `movil` = (?), `domicilio` = (?), `estado` = (?)  
+      WHERE id = $this->id";
       $update = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->apellido_nombre, $this->email, $this->dni, $this->movil, $this->domicilio, $this->estado, $this->id);
+      $datos = array($this->apellido_nombre, $this->email, $this->dni, $this->movil, $this->domicilio, $this->estado);
       $update = $update->execute($datos);
 
       return $update;
@@ -62,7 +71,13 @@ class Cliente
     }
   }
 
-  public static function selectClienteById($id)
+  /**
+   * Se obtiene el cliente que coincida con el id pasado por parámetro. 
+   * @param int $id Id del cliente que se desea buscar
+   * @throws PDOException
+   * @return Cliente Cliente que coincida con el id pasado por parámetro, falso si falla.
+   */
+  public static function selectClienteById(int $id)
   {
     try {
       $sentencia = "SELECT * FROM `clientes` WHERE id = $id";
@@ -74,19 +89,31 @@ class Cliente
     }
   }
 
-  public function selectClientesByDNI()
+  /**
+   * Se obtiene el cliente que coincida con el DNI pasado por parámetro. 
+   * @param int $dni Dni del cliente que se desea buscar
+   * @throws PDOException
+   * @return Cliente Cliente que coincida con el DNI pasado por parámetro, falso si falla.
+   */
+  public function selectClienteByDNI(int $dni)
   {
     try {
-      $sentencia = "SELECT * FROM `clientes` WHERE dni = $this->dni";
+      $sentencia = "SELECT * FROM `clientes` WHERE dni = $dni";
       $select = Conexion::getConexion()->query($sentencia);
 
-      return $select->fetchAll();
+      return $select->fetch();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }
   }
 
-  public function selectClientesByEstado($estado)
+  /**
+   * Se obtiene una lista con todos los clientes que tengan el estado pasado por parámetro. 
+   * @param int<0,1> $estado Estado del cliente. 0 = baja, 1 = activo
+   * @throws PDOException
+   * @return array<Cliente> Lista de todos los clientes con estado baja o activo pasado por parámetro, falso si falla.
+   */
+  public function selectClientesByEstado(int $estado): array
   {
     try {
       // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
@@ -99,7 +126,12 @@ class Cliente
     }
   }
 
-  public static function selectAllClientes()
+  /**
+   * Se obtiene una lista con todos los clientes registrados. 
+   * @throws PDOException
+   * @return array<Cliente> Lista de todos los clientes, falso si falla.
+   */
+  public static function selectAllClientes(): array
   {
     try {
       $sentencia = "SELECT * FROM `clientes` ORDER BY id";
@@ -111,36 +143,43 @@ class Cliente
     }
   }
 
-  public function insertCliente()
+  /**
+   * Crea en la base de datos un nuevo cliente con los datos del objeto Cliente 
+   * @throws PDOException
+   * @return boolean True si se pudo agregar el cliente a la base de datos, false si no se pudo
+   */
+  public function insertCliente(): bool
   {
     try {
-      if ($this->seRepiteDni()) {
-        $dniRepetido = $this->dni;
-        return $dniRepetido;
-      }
+      // Si el DNI ya existe en la base de datos se devuevle para que no deje ingresar DNI repetido.
+      if ($this->seRepiteDni()) return false;
+
       $sentencia = "INSERT INTO `clientes` (`apellido_nombre`, `email`, `dni`, `movil`, `domicilio`, `estado`) VALUES (?,?,?,?,?,?)";
       $insert = Conexion::getConexion()->prepare($sentencia);
-      // El 1 en estado es porque esta activo
+      // Estado 1 porque siempre es activo en el alta
       $datos = array($this->apellido_nombre, $this->email, $this->dni, $this->movil, $this->domicilio, 1);
       $insert = $insert->execute($datos);
       $this->id = Conexion::getConexion()->lastInsertId();
 
-      // return $this->id;
-      return "Se ha ingresado correctamente a $this->apellido_nombre";
+      return $insert;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }
   }
 
-  private function seRepiteDni()
+  /**
+   * Busca si el DNI del objeto Cliente es repetido en la base de datos. Si es repetido devuelve true, si no false
+   * @return boolean 
+   */
+  private function seRepiteDni(): bool
   {
-    $clientes = $this->selectAllClientes();
+    $clientes = Cliente::selectAllClientes();
     $index = 0;
     $cantClientes = count($clientes);
     $seRepite = false;
     while ($index < $cantClientes && !$seRepite) {
       if ($this->dni === $clientes[$index]->dni) {
-        $seRepite = $clientes[$index]->apellido_nombre;
+        $seRepite = true;
       }
       $index++;
     }
@@ -148,13 +187,6 @@ class Cliente
     return $seRepite;
   }
 
-  // public function getEstadoToString()
-  // {
-  //   $estado = ($this->estado === 1)
-  //     ? "Activo"
-  //     : "Baja";
-  //   return $estado;
-  // }
 
   public function getId()
   {

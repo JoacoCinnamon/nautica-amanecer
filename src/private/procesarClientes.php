@@ -16,9 +16,8 @@ $modal_apellido_nombre = $modal_email = $modal_dni = $modal_movil = $modal_domic
 $estado = 1;
 
 
-
 /**
- * Boton para agregar un cliente
+ * Boton para agregar cliente
  */
 if (isset($_POST["agregarClientes"])) {
   $apellido_nombre = validarInput($_POST["apellido_nombre"]);
@@ -29,18 +28,15 @@ if (isset($_POST["agregarClientes"])) {
 
   $cliente = new Cliente(0, $apellido_nombre, $email, $dni, $movil, $domicilio, $estado);
   $msg = $cliente->insertCliente();
-
   $id = 0;
   $apellido_nombre = $email = $dni = $movil = $domicilio = "";
   $estado = 1;
 }
 
-/**
- * GRANDES AVANCES
- * TENGO QUE CORREGIR LA ACTUALIZACION/BAJA
- * PORQUE NO ME ESTARÏA DEJANDO BIEN POR EL TEMA DE QUE SE ME ESTA MEZCLANDO EL GET CON EL POST Y ETC
- */
 
+/**
+ * Boton para editar cliente
+ */
 if (isset($_POST["editarClientes"])) {
   $id = $_POST["id"];
   $apellido_nombre = validarInput($_POST["apellido_nombre"]);
@@ -56,10 +52,6 @@ if (isset($_POST["editarClientes"])) {
   $id = 0;
   $apellido_nombre = $email = $dni = $movil = $domicilio = "";
   $estado = 1;
-
-
-  // Lo re-dirijo de nuevo al menu principal para que se reinicie la URL por el GET, sino siempre se va a quedar el ?id= algo 
-  header('Location: clientes.php');
 }
 
 
@@ -69,6 +61,11 @@ if (isset($_POST["editarClientes"])) {
 if (isset($_GET["id"])) {
   $id = $_GET["id"];
   $cliente = Cliente::selectClienteById($id);
+  if (!$cliente) {
+    // Si no existe el cliente lo redirijo de nuevo a clientes.php
+    header('Location: clientes.php');
+    http_response_code(404);
+  }
   $apellido_nombre = $cliente->apellido_nombre;
   $email = $cliente->email;
   $dni = $cliente->dni;
@@ -78,7 +75,7 @@ if (isset($_GET["id"])) {
 }
 
 
-function getEstadoToString($cliente)
+function getEstadoToString($cliente): string
 {
   return ($cliente->estado == 1)
     ? "Activo"

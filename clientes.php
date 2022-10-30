@@ -5,7 +5,7 @@
 
   <script defer src="./js/validarClientes.js"></script>
 
-  <form name="clientes" id="formClientes" action="" method="POST" class="col-md-4 py-3">
+  <form name="clientes" id="formClientes" action="clientes.php" method="POST" class="col-md-4 py-3">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title text-center">Clientes</h3>
@@ -15,7 +15,7 @@
         <input type="hidden" name="id" value="<?php echo $id ?>">
 
         <div class="form-floating mb-3">
-          <input type="text" class="form-control" name="apellido_nombre" value="<?php echo $apellido_nombre ?>" id="apellido_nombre">
+          <input type="text" class="form-control" name="apellido_nombre" value="<?php echo $apellido_nombre ?>" id="apellido_nombre" maxlength="80">
           <label for="nombre">Apellidos y Nombres</label>
           <p></p>
         </div>
@@ -28,7 +28,7 @@
         <div class="row gy-2 gx-3 align-items-center">
           <div class="col">
             <div class="form-floating mb-3">
-              <input type="text" class="form-control" name="dni" value="<?php echo $dni ?>" id="dni">
+              <input type="text" class="form-control" name="dni" value="<?php echo $dni ?>" id="dni" maxlength="9">
               <label for="dni">DNI</label>
             </div>
           </div>
@@ -45,15 +45,15 @@
         </div>
 
         <div class="form-floating mb-3">
-          <input type="text" class="form-control" name="domicilio" value="<?php echo $domicilio ?>" id="domicilio">
+          <input type="text" class="form-control" name="domicilio" value="<?php echo $domicilio ?>" id="domicilio" maxlength="40">
           <label for="domicilio">Domicilio Completo</label>
         </div>
 
 
         <!-- ESTADO DEL CLIENTE -->
         <?php if ($id != 0) { ?>
-          <!-- Hay un cliente seleccionado, por lo tanto puede cambiar el estado -->
           <div class="row gx-5 gy-2 py-2 mb-2">
+            <!-- Hay un cliente seleccionado, por lo tanto puede cambiar el estado -->
 
             <div class="col-sm">
               <div class="form-check form-check-inline">
@@ -91,6 +91,8 @@
       </div>
     </div>
   </form>
+
+  <!-- Tabla con los datos de los clientes -->
 
   <div class="col-md-8 py-3">
     <div class="table">

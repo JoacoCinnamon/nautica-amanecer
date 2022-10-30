@@ -5,7 +5,7 @@
 
   <!-- <script src="./js/validarAmarras.js"></script> -->
 
-  <form name="amarras" action="" method="POST" class="needs-validation col-md-4 py-3">
+  <form name="amarras" action="amarras.php" method="POST" class="needs-validation col-md-4 py-3">
 
     <div class="card">
       <div class="card-header">
