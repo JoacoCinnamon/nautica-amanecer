@@ -10,6 +10,10 @@ class Conexion
   // $pdo === $instancia
   public static $pdo = null;
 
+  private function __construct()
+  {
+  }
+
   // Singleton instance
   public static function getConexion()
   {

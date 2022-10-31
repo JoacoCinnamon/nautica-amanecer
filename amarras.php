@@ -1,11 +1,11 @@
-<?php include('./templates/header.php'); ?>
-<?php include('./src/private/procesarAmarras.php'); ?>
+<?php include('./public/templates/header.php'); ?>
+<?php include('./src/procesarAmarras.php'); ?>
 
 <div class="row justify-content-center">
 
   <!-- <script src="./js/validarAmarras.js"></script> -->
 
-  <form name="amarras" action="amarras.php" method="POST" class="needs-validation col-md-4 py-3">
+  <form name="amarras" id="formAmarras" action="amarras.php" method="POST" class="needs-validation col-md-4 py-3">
 
     <div class="card">
       <div class="card-header">
@@ -14,7 +14,7 @@
       <div class="card-body">
 
         <div class="form-floating mb-3">
-          <input type="number" class="form-control" name="pasillo" value="<?php echo $pasillo; ?>" id="floatingPasillo">
+          <input type="number" class="form-control" name="pasillo" value="<?php echo $pasillo; ?>" id="pasillo">
           <label for="floatingNombre">Pasillo</label>
         </div>
 
@@ -75,4 +75,4 @@
 
 </div>
 
-<?php include("./templates/footer.php"); ?>
+<?php include("./public/templates/footer.php"); ?>

@@ -1,5 +1,5 @@
 <?php
-require_once('./Classes/Class.Cliente.php');
+require_once('Classes/Class.Cliente.php');
 
 // Se valida para que no haya espacios, ni / y tampoco codigo HTML que puedan meter
 function validarInput($cadena)

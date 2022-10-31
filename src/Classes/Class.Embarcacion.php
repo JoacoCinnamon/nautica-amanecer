@@ -1,8 +1,9 @@
 <?php
 
-require_once('./Classes/Class.Conexion.php');
+require_once('Class.Conexion.php');
+require_once('./src/Interfaces/IUpdateCascada.php');
 
-class Embarcacion
+class Embarcacion implements IUpdateCascada
 {
   private int $id;
   private string $nombre;
@@ -18,7 +19,7 @@ class Embarcacion
   private function deleteEmbarcacion(): bool
   {
     try {
-      $sentencia = "DELETE FROM `embarcacion` WHERE id = (?)";
+      $sentencia = "DELETE FROM `embarcaciones` WHERE id = (?)";
       $delete = Conexion::getConexion()->prepare($sentencia);
       $datos = array($this->id);
       $delete = $delete->execute($datos);
@@ -39,14 +40,9 @@ class Embarcacion
       // (Si se repite este REY en la base de datos PERO (&&) el REY ingresado NO es de la embarcación a modificar)
       if ($this->seRepiteRey() && $this->rey !== $embarcacionAModificar->rey) return false;
 
-      if ($this->estado == 0) {
-        /**  
-         * Si el estado es == 0 significa que se dio de baja la embarcación, por lo tanto también debería de
-         * darse de baja en la amarra enn la que se encontraba (movimiento)
-         */
-      }
+      $this->updateEnCascada();
 
-      $sentencia = "UPDATE `embarcacion` SET `nombre` = (?), `rey` = (?), `id_cliente` = (?), `estado` = (?) WHERE id = $this->id";
+      $sentencia = "UPDATE `embarcaciones` SET `nombre` = (?), `rey` = (?), `id_cliente` = (?), `estado` = (?) WHERE id = $this->id";
       $update = Conexion::getConexion()->prepare($sentencia);
       $datos = array($this->nombre, $this->rey, $this->id_cliente, $this->estado);
       $update = $update->execute($datos);
@@ -57,10 +53,34 @@ class Embarcacion
     }
   }
 
+  /**
+   * Implementación de IDeleteCascada
+   */
+  public function updateEnCascada()
+  {
+    if ($this->estado == 0) {
+      /**  
+       * Si el estado es == 0 significa que se dio de baja la embarcación, por lo tanto también debería de
+       * darse de baja en la amarra en la que se encontraba (movimiento)
+       */
+    }
+  }
+
+  /**
+   * Metodo Set para dar de baja (o de alta si se quisiese) específicamente la embarcación
+   * para cuando el cliente quiere darse de baja, llevándose todas sus embarcaciones
+   */
+  public function setEstado(int $estado)
+  {
+    if ($estado == 0 || $estado == 1) {
+      $this->estado = $estado;
+    }
+  }
+
   public static function selectEmbarcacionById(int $id)
   {
     try {
-      $sentencia = "SELECT * FROM `embarcacion` WHERE id = $id";
+      $sentencia = "SELECT * FROM `embarcaciones` WHERE id = $id";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
@@ -72,7 +92,7 @@ class Embarcacion
   public static function selectEmbarcacionByRey(string $rey)
   {
     try {
-      $sentencia = "SELECT * FROM `embarcacion` WHERE rey = $rey";
+      $sentencia = "SELECT * FROM `embarcaciones` WHERE rey = $rey";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
@@ -81,11 +101,11 @@ class Embarcacion
     }
   }
 
-  public static function selectEmbarcacionesByEstado(int $estado): array
+  public static function selectEmbarcacionesByEstado(int $estado)
   {
     try {
       // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
-      $sentencia = "SELECT * FROM `embarcacion` WHERE estado = $estado ORDER BY id";
+      $sentencia = "SELECT * FROM `embarcaciones` WHERE estado = $estado ORDER BY id";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
@@ -94,10 +114,10 @@ class Embarcacion
     }
   }
 
-  public static function selectEmbarcacionesByCliente(int $id_cliente): array
+  public static function selectEmbarcacionesByCliente(int $id_cliente)
   {
     try {
-      $sentencia = "SELECT * FROM `embarcacion` WHERE id_cliente = $id_cliente";
+      $sentencia = "SELECT * FROM `embarcaciones` WHERE id_cliente = $id_cliente";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
@@ -106,10 +126,10 @@ class Embarcacion
     }
   }
 
-  public static function selectAllEmbarcaciones(): array
+  public static function selectAllEmbarcaciones()
   {
     try {
-      $sentencia = "SELECT * FROM `embarcacion` ORDER BY id";
+      $sentencia = "SELECT * FROM `embarcaciones` ORDER BY id";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();

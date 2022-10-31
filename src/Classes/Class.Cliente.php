@@ -1,8 +1,10 @@
 <?php
 
-require_once('./Classes/Class.Conexion.php');
+require_once('Class.Conexion.php');
+require_once('Class.Embarcacion.php');
+require_once('./src/Interfaces/IUpdateCascada.php');
 
-class Cliente
+class Cliente implements IUpdateCascada
 {
   private int $id;
   private string $apellido_nombre;
@@ -52,12 +54,7 @@ class Cliente
       // (Si se repite este DNI en la base de datos PERO (&&) el DNI ingresado NO es del cliente a modificar)
       if ($this->seRepiteDni() && $this->dni !== $clienteAModificar->dni) return false;
 
-      if ($this->estado == 0) {
-        $embarcacionesBaja = Embarcacion::selectEmbarcacionesByCliente($this->id);
-        foreach ($embarcacionesBaja as $embarcacionActual) {
-          $embarcacionActual->updateEmbarcacion();
-        }
-      }
+      $this->updateEnCascada();
 
       $sentencia = "UPDATE `clientes` SET `apellido_nombre` = (?), `email` = (?), `dni` = (?), `movil` = (?), `domicilio` = (?), `estado` = (?)  
       WHERE id = $this->id";
@@ -68,6 +65,21 @@ class Cliente
       return $update;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+    }
+  }
+
+  /**
+   * Implementación de IDeleteCascada
+   */
+  public function updateEnCascada()
+  {
+    if ($this->estado == 0) {
+      $embarcacionesCliente = Embarcacion::selectEmbarcacionesByCliente($this->id);
+      // Si hay embarcaciones de este cliente
+      foreach ((array) $embarcacionesCliente as $embarcacionActual) {
+        $embarcacionActual->setEstado(0);
+        $embarcacionActual->updateEmbarcacion();
+      }
     }
   }
 

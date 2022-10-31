@@ -1,5 +1,5 @@
-<?php include('./templates/header.php'); ?>
+<?php include('./public/templates/header.php'); ?>
 
 
 
-<?php include("./templates/footer.php"); ?>
+<?php include("./public/templates/footer.php"); ?>

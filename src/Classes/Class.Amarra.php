@@ -1,6 +1,6 @@
 <?php
 
-require_once('./Classes/Class.Conexion.php');
+require_once('Class.Conexion.php');
 
 class Amarra
 {

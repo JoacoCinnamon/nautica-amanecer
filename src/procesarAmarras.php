@@ -1,5 +1,5 @@
 <?php
-require_once('./Classes/Class.Amarra.php');
+require_once('Classes/Class.Amarra.php');
 
 
 // Por defecto no hay id, ni pasillo y el estado es libre

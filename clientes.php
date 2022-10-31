@@ -1,5 +1,5 @@
-<?php include('./templates/header.php'); ?>
-<?php include('./src/private/procesarClientes.php'); ?>
+<?php include('./public/templates/header.php'); ?>
+<?php include('./src/procesarClientes.php'); ?>
 
 <div class="row">
 
@@ -144,4 +144,4 @@
 </script>
 
 
-<?php include("./templates/footer.php"); ?>
+<?php include("./public/templates/footer.php"); ?>
