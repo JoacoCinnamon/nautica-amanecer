@@ -23,7 +23,9 @@ class Conexion
         $dsn = 'mysql:dbname=' . self::DB . ';port=' . self::HOST_PORT . ',host=' . self::HOST_NAME;
         $options = array(
           PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4'",
-          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ // The default fetch mode is PDO::FETCH_OBJ foreach
+          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ, // The default fetch mode is PDO::FETCH_OBJ and PDO::FETCH_ASSOC
+          PDO::ATTR_EMULATE_PREPARES => false,
+          PDO::ATTR_STRINGIFY_FETCHES => false
         );
 
         self::$pdo = new PDO($dsn, self::HOST_USER, self::HOST_PASS, $options);

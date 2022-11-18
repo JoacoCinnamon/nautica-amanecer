@@ -38,7 +38,7 @@ class Embarcacion implements IUpdateCascada
     try {
       $embarcacionAModificar = Embarcacion::selectEmbarcacionById($this->id);
       // (Si se repite este REY en la base de datos PERO (&&) el REY ingresado NO es de la embarcación a modificar)
-      if ($this->seRepiteRey() && $this->rey !== $embarcacionAModificar->rey) return false;
+      if ($this->seRepiteRey() && $this->rey != $embarcacionAModificar->rey) return false;
 
       $this->updateEnCascada();
 
@@ -62,6 +62,7 @@ class Embarcacion implements IUpdateCascada
       /**  
        * Si el estado es == 0 significa que se dio de baja la embarcación, por lo tanto también debería de
        * darse de baja en la amarra en la que se encontraba (movimiento)
+       * Si o si debería de estar ocupado, sino no se estaría dando de baja
        */
     }
   }
@@ -77,6 +78,20 @@ class Embarcacion implements IUpdateCascada
     }
   }
 
+  public function __call($name, $arguments)
+  {
+    echo "<br>$name no está definido";
+    foreach ($arguments as $arg) {
+      echo "<br>parametro: $arg";
+    }
+  }
+
+  /**
+   * Se obtiene la embarcacion que coincida con el id pasado por parámetro. 
+   * @param int $id Id de la embarcación que se desea buscar
+   * @throws PDOException
+   * @return Embarcacion Embarcacion que coincida con el id pasado por parámetro, falso si falla.
+   */
   public static function selectEmbarcacionById(int $id)
   {
     try {
@@ -105,19 +120,27 @@ class Embarcacion implements IUpdateCascada
   {
     try {
       // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
-      $sentencia = "SELECT * FROM `embarcaciones` WHERE estado = $estado ORDER BY id";
-      $select = Conexion::getConexion()->query($sentencia);
+      if ($estado == 0 || $estado == 1) {
+        $sentencia = "SELECT * FROM `embarcaciones` WHERE estado = $estado ORDER BY id";
+        $select = Conexion::getConexion()->query($sentencia);
 
-      return $select->fetchAll();
+        return $select->fetchAll();
+      }
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }
   }
 
-  public static function selectEmbarcacionesByCliente(int $id_cliente)
+  /**
+   * Se obtiene una lista con todas las embarcaciones del cliente con el id pasado por parámetro. 
+   * @param int $id_cliente Id del cliente del que se desea saber sus embarcaciones
+   * @throws PDOException
+   * @return array<Embarcacion>|Embarcacion Lista de todas las embarcaciones que tiene el cliente con id pasado por parámetro, falso si falla.
+   */
+  public static function selectEmbarcacionesByCliente($id_cliente): array|Embarcacion
   {
     try {
-      $sentencia = "SELECT * FROM `embarcaciones` WHERE id_cliente = $id_cliente";
+      $sentencia = "SELECT * FROM `embarcaciones` WHERE `id_cliente` = $id_cliente";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
@@ -129,7 +152,7 @@ class Embarcacion implements IUpdateCascada
   public static function selectAllEmbarcaciones()
   {
     try {
-      $sentencia = "SELECT * FROM `embarcaciones` ORDER BY id";
+      $sentencia = "SELECT * FROM `embarcaciones` ORDER BY id DESC";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
@@ -138,7 +161,7 @@ class Embarcacion implements IUpdateCascada
     }
   }
 
-  public function insertEmbarcacion(): bool
+  public function insertEmbarcacion()
   {
     try {
       if ($this->seRepiteRey()) return false;
@@ -167,13 +190,22 @@ class Embarcacion implements IUpdateCascada
     $cantEmbarcaciones = count($embarcaciones);
     $seRepite = false;
     while ($index < $cantEmbarcaciones && !$seRepite) {
-      if ($this->rey === $embarcaciones[$index]->rey) {
+      if ($this->rey == $embarcaciones[$index]->rey) {
         $seRepite = true;
       }
       $index++;
     }
 
     return $seRepite;
+  }
+
+  public function __construct(int $id, string $nombre, string $rey, int $id_cliente, int $estado)
+  {
+    $this->id = $id;
+    $this->nombre = $nombre;
+    $this->rey = $rey;
+    $this->id_cliente = $id_cliente;
+    $this->estado = $estado;
   }
 
   /**

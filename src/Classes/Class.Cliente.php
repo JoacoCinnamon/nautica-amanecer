@@ -14,17 +14,6 @@ class Cliente implements IUpdateCascada
   private string $domicilio;
   private int $estado;
 
-  public function __construct(int $id, string $apellido_nombre, string $email, int $dni, string $movil, string $domicilio, int $estado)
-  {
-    $this->id = $id;
-    $this->apellido_nombre = $apellido_nombre;
-    $this->email = $email;
-    $this->dni = $dni;
-    $this->movil = $movil;
-    $this->domicilio = $domicilio;
-    $this->estado = $estado;
-  }
-
   /**
    * Eliminar unn cliente de la base de datos
    * @throws PDOException
@@ -52,7 +41,7 @@ class Cliente implements IUpdateCascada
     try {
       $clienteAModificar = Cliente::selectClienteById($this->id);
       // (Si se repite este DNI en la base de datos PERO (&&) el DNI ingresado NO es del cliente a modificar)
-      if ($this->seRepiteDni() && $this->dni !== $clienteAModificar->dni) return false;
+      if ($this->seRepiteDni() && $this->dni != $clienteAModificar->dni) return false;
 
       $this->updateEnCascada();
 
@@ -76,11 +65,28 @@ class Cliente implements IUpdateCascada
     if ($this->estado == 0) {
       $embarcacionesCliente = Embarcacion::selectEmbarcacionesByCliente($this->id);
       // Si hay embarcaciones de este cliente
-      foreach ((array) $embarcacionesCliente as $embarcacionActual) {
+      foreach ($embarcacionesCliente as $embarcacionActual) {
+        $embarcacionActual = new Embarcacion(
+          /**
+           * Harckodeo una nueva embarcación porque PHP me castea a $embarcacionActual a stdClass y no a una Embarcacion.
+           * Por lo que la primera solución que se me ocurre es re-instanciarla como Embarcacion con los datos que contiene, porque
+           * si contiene las propiedades que tiene una embarcación pero al ser de tipo stdClass no puede acceder a los métodos de Embarcacion
+           */
+          $embarcacionActual->id,
+          $embarcacionActual->nombre,
+          $embarcacionActual->rey,
+          $embarcacionActual->id_cliente,
+          $embarcacionActual->estado
+        );
         $embarcacionActual->setEstado(0);
         $embarcacionActual->updateEmbarcacion();
       }
     }
+  }
+
+  public function setEstado($estado)
+  {
+    $this->estado = $estado;
   }
 
   /**
@@ -125,14 +131,16 @@ class Cliente implements IUpdateCascada
    * @throws PDOException
    * @return array<Cliente> Lista de todos los clientes con estado baja o activo pasado por parámetro, falso si falla.
    */
-  public function selectClientesByEstado(int $estado): array
+  public static function selectClientesByEstado(int $estado): array
   {
     try {
-      // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
-      $sentencia = "SELECT * FROM `clientes` WHERE estado = $estado ORDER BY id";
-      $select = Conexion::getConexion()->query($sentencia);
+      if ($estado == 0 || $estado == 1) {
+        // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
+        $sentencia = "SELECT * FROM `clientes` WHERE estado = $estado ORDER BY id";
+        $select = Conexion::getConexion()->query($sentencia);
 
-      return $select->fetchAll();
+        return $select->fetchAll();
+      }
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }
@@ -146,7 +154,7 @@ class Cliente implements IUpdateCascada
   public static function selectAllClientes(): array
   {
     try {
-      $sentencia = "SELECT * FROM `clientes` ORDER BY id";
+      $sentencia = "SELECT * FROM `clientes` ORDER BY id DESC";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
@@ -190,13 +198,24 @@ class Cliente implements IUpdateCascada
     $cantClientes = count($clientes);
     $seRepite = false;
     while ($index < $cantClientes && !$seRepite) {
-      if ($this->dni === $clientes[$index]->dni) {
+      if ($this->dni == $clientes[$index]->dni) {
         $seRepite = true;
       }
       $index++;
     }
 
     return $seRepite;
+  }
+
+  public function __construct(int $id, string $apellido_nombre, string $email, int $dni, string $movil, string $domicilio, int $estado)
+  {
+    $this->id = $id;
+    $this->apellido_nombre = $apellido_nombre;
+    $this->email = $email;
+    $this->dni = $dni;
+    $this->movil = $movil;
+    $this->domicilio = $domicilio;
+    $this->estado = $estado;
   }
 
 

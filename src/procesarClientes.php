@@ -33,6 +33,27 @@ if (isset($_POST["agregarClientes"])) {
   $estado = 1;
 }
 
+/**
+ * Boton para seleccionar un cliente
+ */
+if (isset($_GET["id"])) {
+  $id = $_GET["id"];
+  $cliente = Cliente::selectClienteById($id);
+  if (!$cliente) {
+    // Si no existe el cliente lo redirijo de nuevo a clientes.php
+    //http_response_code(404);
+    header('Location: clientes.php');
+    exit();
+  } else {
+    // Else por las dudas, hay veces que no redirigia bien el header
+    $apellido_nombre = $cliente->apellido_nombre;
+    $email = $cliente->email;
+    $dni = $cliente->dni;
+    $movil = $cliente->movil;
+    $domicilio = $cliente->domicilio;
+    $estado = $cliente->estado;
+  }
+}
 
 /**
  * Boton para editar cliente
@@ -55,24 +76,6 @@ if (isset($_POST["editarClientes"])) {
 }
 
 
-/**
- * Boton para seleccionar un cliente
- */
-if (isset($_GET["id"])) {
-  $id = $_GET["id"];
-  $cliente = Cliente::selectClienteById($id);
-  if (!$cliente) {
-    // Si no existe el cliente lo redirijo de nuevo a clientes.php
-    header('Location: clientes.php');
-    http_response_code(404);
-  }
-  $apellido_nombre = $cliente->apellido_nombre;
-  $email = $cliente->email;
-  $dni = $cliente->dni;
-  $movil = $cliente->movil;
-  $domicilio = $cliente->domicilio;
-  $estado = $cliente->estado;
-}
 
 
 function getEstadoToString($cliente): string

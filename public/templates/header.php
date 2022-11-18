@@ -47,7 +47,7 @@
               <a class="nav-link" href="clientes.php">Clientes</a>
             </li>
             <li>
-              <a class="nav-link" href="embarcacion.php">Embarcaciones</a>
+              <a class="nav-link" href="embarcaciones.php">Embarcaciones</a>
             </li>
             <li>
               <a class="nav-link" href="amarras.php">Amarras</a>
@@ -62,6 +62,6 @@
     </nav>
   </header>
   <!-- Parte de arriba de todos los bodys -->
-  <div class="container">
-    <div class="row">
-      <div class="col-12 py-3">
+  <div class="container py-3">
+    <!-- <div class="row">
+      <div class="col-12 py-3"> -->

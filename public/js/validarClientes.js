@@ -8,7 +8,7 @@ window.addEventListener("load", () => {
 
   // Una vez que desencadenamos el sumbit hacemos que no vaya al action
   form.addEventListener("submit", (e) => {
-    console.log("submit", e);
+    //console.log("submit", e);
     if (!contieneAlgo()) {
       e.preventDefault();
     }

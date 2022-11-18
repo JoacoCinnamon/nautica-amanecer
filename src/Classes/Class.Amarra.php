@@ -6,14 +6,12 @@ class Amarra
 {
   private int $id;
   private int $pasillo;
+  /**
+   * 0 = libre,
+   * 1 = ocupada
+   */
   private int $estado;
 
-  public function __construct($id, $pasillo, $estado)
-  {
-    $this->id = $id;
-    $this->pasillo = $pasillo;
-    $this->estado = $estado;
-  }
 
   public function deleteAmarra(): bool
   {
@@ -43,6 +41,18 @@ class Amarra
       return $update;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+    }
+  }
+
+
+  /**
+   * Metodo Set para ocupar/desocupar específicamente la amarra
+   * para por ejemplo cuando el cliente quiere darse de baja, llevándose todas sus embarcaciones
+   */
+  public function setEstado(int $estado)
+  {
+    if ($estado == 0 || $estado == 1) {
+      $this->estado = $estado;
     }
   }
 
@@ -91,10 +101,12 @@ class Amarra
   public static function selectAmarrasByEstado(int $estado): array
   {
     try {
-      $sentencia = "SELECT * FROM `amarras` WHERE estado = $estado ORDER BY pasillo";
-      $select = Conexion::getConexion()->query($sentencia);
+      if ($estado == 0 || $estado == 1) {
+        $sentencia = "SELECT * FROM `amarras` WHERE estado = $estado ORDER BY pasillo";
+        $select = Conexion::getConexion()->query($sentencia);
 
-      return $select->fetchAll();
+        return $select->fetchAll();
+      }
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }
@@ -135,6 +147,13 @@ class Amarra
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
     }
+  }
+
+  public function __construct($id, $pasillo, $estado)
+  {
+    $this->id = $id;
+    $this->pasillo = $pasillo;
+    $this->estado = $estado;
   }
 
   // GetId method

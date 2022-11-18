@@ -3,7 +3,7 @@
 
 <div class="row">
 
-  <script defer src="./js/validarClientes.js"></script>
+  <script defer src="./public/js/validarClientes.js"></script>
 
   <form name="clientes" id="formClientes" action="clientes.php" method="POST" class="col-md-4 py-3">
     <div class="card">
@@ -12,23 +12,23 @@
       </div>
       <div class="card-body">
 
-        <input type="hidden" name="id" value="<?php echo $id ?>">
+        <input type="hidden" name="id" value="<?= $id ?>">
 
         <div class="form-floating mb-3">
-          <input type="text" class="form-control" name="apellido_nombre" value="<?php echo $apellido_nombre ?>" id="apellido_nombre" maxlength="80">
+          <input type="text" class="form-control" name="apellido_nombre" value="<?= $apellido_nombre ?>" id="apellido_nombre" maxlength="80">
           <label for="nombre">Apellidos y Nombres</label>
           <p></p>
         </div>
 
         <div class="form-floating mb-3">
-          <input type="email" class="form-control" name="email" value="<?php echo $email ?>" id="email">
+          <input type="email" class="form-control" name="email" value="<?= $email ?>" id="email">
           <label for="email">Email</label>
         </div>
 
         <div class="row gy-2 gx-3 align-items-center">
           <div class="col">
             <div class="form-floating mb-3">
-              <input type="text" class="form-control" name="dni" value="<?php echo $dni ?>" id="dni" maxlength="9">
+              <input type="text" class="form-control" name="dni" value="<?= $dni ?>" id="dni" maxlength="9">
               <label for="dni">DNI</label>
             </div>
           </div>
@@ -38,14 +38,14 @@
               <label class="visually-hidden" for="movil">Movil</label>
               <div class="input-group">
                 <div class="input-group-text">+54</div>
-                <input type="text" class="form-control" name="movil" value="<?php echo $movil ?>" id="movil" placeholder="Movil" maxlength="10">
+                <input type="text" class="form-control" name="movil" value="<?= $movil ?>" id="movil" placeholder="Movil" maxlength="10">
               </div>
             </div>
           </div>
         </div>
 
         <div class="form-floating mb-3">
-          <input type="text" class="form-control" name="domicilio" value="<?php echo $domicilio ?>" id="domicilio" maxlength="40">
+          <input type="text" class="form-control" name="domicilio" value="<?= $domicilio ?>" id="domicilio" maxlength="40">
           <label for="domicilio">Domicilio Completo</label>
         </div>
 
@@ -111,23 +111,20 @@
         <tbody>
           <?php
           $clientes = Cliente::selectAllClientes();
-          foreach ($clientes as $clienteActual) { ?>
+          foreach ((array) $clientes as $clienteActual) { ?>
             <tr>
-              <td><?php print $clienteActual->id; ?></td>
-              <td><?php print $clienteActual->apellido_nombre; ?> </td>
-              <td><?php print $clienteActual->email; ?></td>
-              <td><?php print $clienteActual->dni; ?></td>
-              <td><?php print $clienteActual->movil; ?></td>
-              <td><?php print $clienteActual->domicilio; ?></td>
-              <td><?php print getEstadoToString($clienteActual); ?></td>
+              <td><?= $clienteActual->id; ?></td>
+              <td><?= $clienteActual->apellido_nombre; ?> </td>
+              <td><?= $clienteActual->email; ?></td>
+              <td><?= $clienteActual->dni; ?></td>
+              <td><?= $clienteActual->movil; ?></td>
+              <td><?= $clienteActual->domicilio; ?></td>
+              <td><?= getEstadoToString($clienteActual); ?></td>
               <td>
                 <a href="clientes.php?id=<?php echo $clienteActual->id; ?>"><i class="bi bi-pencil-square text-success"></i></a>
               </td>
-
             </tr>
-          <?php
-          }
-          ?>
+          <?php } ?>
       </table>
     </div>
   </div>
@@ -138,7 +135,9 @@
   /**
    * Datatables
    */
-  const dataTable = new simpleDatatables.DataTable("#tablaClientes", {
+  const dtClientes = new simpleDatatables.DataTable("#tablaClientes", {
+    perPage: 4,
+    perPageSelect: false
     // Acá iria la traduccion al español si me dejara instalarlo
   });
 </script>
