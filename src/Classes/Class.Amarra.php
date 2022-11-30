@@ -2,23 +2,41 @@
 
 require_once('Class.Conexion.php');
 
+/**
+ * Amarra donde se almacenan embarcaciones.
+ */
 class Amarra
 {
-  private int $id;
-  private int $pasillo;
   /**
-   * 0 = libre,
-   * 1 = ocupada
+   * Id de la amarra (PK).
+   *
+   * @var integer
+   */
+  private int $id;
+
+  /**
+   * Pasillo en el que se encuentra la amarra.
+   *
+   * @var integer
+   */
+  private int $pasillo;
+
+  /**
+   * Estado actual de la amarra.
+   * 0 = libre, 1 = ocupada 
+   *
+   * @var integer
    */
   private int $estado;
 
 
-  public function deleteAmarra(): bool
+  public function deleteAmarra()
   {
     try {
       return false;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -27,20 +45,20 @@ class Amarra
    * @throws PDOException
    * @return boolean True si se actualizó, false si no 
    */
-  public function updateAmarra(): bool
+  public function updateAmarra()
   {
     try {
-      $sentencia = "UPDATE `amarras` SET `pasillo` = (?), `estado` = (?) WHERE id = (?)";
+      $sentencia = "UPDATE `amarras` SET `pasillo` = :pasillo, `estado` = :estado WHERE `id` = $this->id";
       $update = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->pasillo, $this->estado, $this->id);
-      $update = $update->execute($datos);
-      // $estado = ($this->estado == 0)
-      //   ? "libre"
-      //   : "ocupada";
+      $update = $update->execute([
+        ":pasillo" => $this->pasillo,
+        ":estado" => $this->estado
+      ]);
 
       return $update;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -65,12 +83,13 @@ class Amarra
   public static function selectAmarraById(int $id)
   {
     try {
-      $sentencia = "SELECT * FROM `amarras` WHERE id = $id";
+      $sentencia = "SELECT * FROM `amarras` WHERE id = $id LIMIT 1";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -89,6 +108,7 @@ class Amarra
       return $select->fetchAll();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -102,13 +122,15 @@ class Amarra
   {
     try {
       if ($estado == 0 || $estado == 1) {
-        $sentencia = "SELECT * FROM `amarras` WHERE estado = $estado ORDER BY pasillo";
+        $sentencia = "SELECT * FROM `amarras` WHERE `estado` = $estado ORDER BY pasillo";
         $select = Conexion::getConexion()->query($sentencia);
 
         return $select->fetchAll();
       }
+      return [];
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -120,12 +142,13 @@ class Amarra
   public static function selectAllAmarras(): array
   {
     try {
-      $sentencia = "SELECT * FROM `amarras` ORDER BY pasillo";
+      $sentencia = "SELECT * FROM `amarras` ORDER BY id";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -134,18 +157,21 @@ class Amarra
    * @throws PDOException
    * @return boolean True si se pudo agregar el cliente a la base de datos, false si no se pudo
    */
-  public function insertAmarra(): bool
+  public function insertAmarra()
   {
     try {
-      $sentencia = "INSERT INTO `amarras` (`pasillo`, `estado`) VALUES (?,?)";
+      $sentencia = "INSERT INTO `amarras` (`pasillo`, `estado`) VALUES (:pasillo,:estado)";
       $insert = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->pasillo, $this->estado);
-      $insert = $insert->execute($datos);
+      $insert = $insert->execute([
+        ":pasillo" => $this->pasillo,
+        ":estado" => $this->estado
+      ]);
       $this->id = Conexion::getConexion()->lastInsertId();
 
       return $insert;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -154,26 +180,5 @@ class Amarra
     $this->id = $id;
     $this->pasillo = $pasillo;
     $this->estado = $estado;
-  }
-
-  // GetId method
-
-  public function getId()
-  {
-    return $this->id;
-  }
-
-  // GetPasillo method
-
-  public function getPasillo()
-  {
-    return $this->pasillo;
-  }
-
-  // GetEstado method
-
-  public function getEstado()
-  {
-    return $this->estado;
   }
 }

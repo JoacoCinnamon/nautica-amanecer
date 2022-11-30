@@ -20,9 +20,9 @@ window.addEventListener("load", () => {
       clientes: clientes.value.trim(),
     };
     return (
-      embarcacion.nombre != "" &&
-      embarcacion.rey != "" &&
-      embarcacion.clientes != 0
+      embarcacion.nombre !== "" &&
+      embarcacion.rey !== "" &&
+      embarcacion.clientes !== 0
     );
   };
 });

@@ -2,7 +2,6 @@
 <?php include('./src/procesarClientes.php'); ?>
 
 <div class="row">
-
   <script defer src="./public/js/validarClientes.js"></script>
 
   <form name="clientes" id="formClientes" action="clientes.php" method="POST" class="col-md-4 py-3">
@@ -51,7 +50,7 @@
 
 
         <!-- ESTADO DEL CLIENTE -->
-        <?php if ($id != 0) { ?>
+        <?php if ($id != 0) : ?>
           <div class="row gx-5 gy-2 py-2 mb-2">
             <!-- Hay un cliente seleccionado, por lo tanto puede cambiar el estado -->
 
@@ -70,14 +69,14 @@
             </div>
 
           </div>
-        <?php } ?>
+        <?php endif ?>
 
 
         <div class="row gx-3 gy-2 align-items-center">
-          <?php if ($id == 0) { ?>
+          <?php if ($id == 0) : ?>
             <!-- No hay ningún cliente seleccionado -->
             <button type="submit" class="w-100 btn btn-lg btn-primary" name="agregarClientes" id="agregarClientes" value="Agregar">Agregar</button>
-          <?php } else { ?>
+          <?php else : ?>
             <!-- Hay un cliente seleccionado -->
             <div class="col-sm">
               <button type="submit" class="w-100 btn btn-lg btn-info" name="editarClientes" id="editarClientes" value="Actualizar">Actualizar</button>
@@ -85,7 +84,7 @@
             <div class="col-sm">
               <button type="button" class="w-100 btn btn-lg btn-danger" name="cancelarEditar" id="cancelarEditar" value="Cancelar" onClick="location.href='clientes.php'">Cancelar</button>
             </div>
-          <?php } ?>
+          <?php endif ?>
         </div>
 
       </div>
@@ -109,9 +108,8 @@
           </tr>
         </thead>
         <tbody>
-          <?php
-          $clientes = Cliente::selectAllClientes();
-          foreach ((array) $clientes as $clienteActual) { ?>
+          <?php $clientes = Cliente::selectAllClientes();
+          foreach ((array) $clientes as $clienteActual) : ?>
             <tr>
               <td><?= $clienteActual->id; ?></td>
               <td><?= $clienteActual->apellido_nombre; ?> </td>
@@ -121,10 +119,10 @@
               <td><?= $clienteActual->domicilio; ?></td>
               <td><?= getEstadoToString($clienteActual); ?></td>
               <td>
-                <a href="clientes.php?id=<?php echo $clienteActual->id; ?>"><i class="bi bi-pencil-square text-success"></i></a>
+                <a href="clientes.php?id=<?= $clienteActual->id; ?>"><i class="bi bi-pencil-square text-success"></i></a>
               </td>
             </tr>
-          <?php } ?>
+          <?php endforeach ?>
       </table>
     </div>
   </div>

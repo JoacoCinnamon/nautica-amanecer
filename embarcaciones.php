@@ -2,7 +2,6 @@
 <?php include('./src/procesarEmbarcaciones.php'); ?>
 
 <div class="row">
-
   <script defer src="./public/js/validarEmbarcaciones.js"></script>
 
   <form name="embarcaciones" id="formEmbarcaciones" action="embarcaciones.php" method="POST" class="col-md-4 py-3">
@@ -29,20 +28,19 @@
         <div class="form-floating mb-3">
           <select class="form-select" aria-label="selectClientes" name="idCliente" id="idCliente">
             <option value="0">Seleccione el dueño...</option>
-            <?php
-            $clientes = Cliente::selectClientesByEstado(1);
-            foreach ((array) $clientes as $clienteActual) { ?>
+            <?php $clientes = Cliente::selectClientesByEstado(1); ?>
+            <?php foreach ((array) $clientes as $clienteActual) : ?>
               <option value="<?= $clienteActual->id; ?>" <?php if ($id_cliente == $clienteActual->id) print "selected";
                                                           ?>>
                 <?= "$clienteActual->apellido_nombre - $clienteActual->dni" ?> </option>
-            <?php } ?>
+            <?php endforeach ?>
           </select>
           <label for="idCliente">Dueño</label>
         </div>
 
 
         <!-- ESTADO DE LA EMBARCACION -->
-        <?php if ($id != 0) { ?>
+        <?php if ($id != 0) : ?>
           <div class="row gx-5 gy-2 py-2 mb-2">
             <!-- Hay una embarcacion seleccionada, por lo tanto puede cambiar el estado -->
 
@@ -61,14 +59,14 @@
             </div>
 
           </div>
-        <?php } ?>
+        <?php endif ?>
 
 
         <div class="row gx-3 gy-2 align-items-center">
-          <?php if ($id == 0) { ?>
+          <?php if ($id == 0) : ?>
             <!-- No hay ningúna embarcacion seleccionada -->
             <button type="submit" class="w-100 btn btn-lg btn-primary" name="agregarEmbarcaciones" id="agregarEmbarcaciones" value="Agregar">Agregar</button>
-          <?php } else { ?>
+          <?php else :  ?>
             <!-- Hay una embarcacion seleccionada -->
             <div class="col-sm">
               <button type="submit" class="w-100 btn btn-lg btn-info" name="editarEmbarcaciones" id="editarEmbarcaciones" value="Actualizar">Actualizar</button>
@@ -76,7 +74,7 @@
             <div class="col-sm">
               <button type="button" class="w-100 btn btn-lg btn-danger" name="cancelarEditar" id="cancelarEditar" value="Cancelar" onClick="location.href='embarcaciones.php'">Cancelar</button>
             </div>
-          <?php } ?>
+          <?php endif ?>
         </div>
 
       </div>
@@ -98,9 +96,8 @@
           </tr>
         </thead>
         <tbody>
-          <?php
-          $embarcaciones = Embarcacion::selectAllEmbarcaciones();
-          foreach ((array) $embarcaciones as $embarcacionActual) { ?>
+          <?php $embarcaciones = Embarcacion::selectAllEmbarcaciones(); ?>
+          <?php foreach ((array) $embarcaciones as $embarcacionActual) : ?>
             <tr>
               <td><?= $embarcacionActual->id; ?></td>
               <td><?= $embarcacionActual->nombre; ?></td>
@@ -112,7 +109,7 @@
                 <a href="embarcaciones.php?id=<?= $embarcacionActual->id; ?>"><i class="bi bi-pencil-square text-success"></i></a>
               </td>
             </tr>
-          <?php } ?>
+          <?php endforeach ?>
       </table>
     </div>
   </div>

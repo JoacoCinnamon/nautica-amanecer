@@ -1,14 +1,23 @@
 <?php
 
 require_once('Class.Conexion.php');
+require_once('Class.Movimiento.php');
 require_once('./src/Interfaces/IUpdateCascada.php');
 
+/**
+ * Embarcaciones de los distintos clientes.
+ */
 class Embarcacion implements IUpdateCascada
 {
   private int $id;
+
   private string $nombre;
-  private string $rey; // como una patente
+
+  // Como una patente
+  private string $rey;
+
   private int $id_cliente;
+
   private int $estado;
 
   /**
@@ -16,7 +25,7 @@ class Embarcacion implements IUpdateCascada
    * @throws PDOException
    * @return boolean True si se eliminó, false si no se eliminó 
    */
-  private function deleteEmbarcacion(): bool
+  private function deleteEmbarcacion()
   {
     try {
       $sentencia = "DELETE FROM `embarcaciones` WHERE id = (?)";
@@ -27,6 +36,7 @@ class Embarcacion implements IUpdateCascada
       return $delete;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -42,28 +52,43 @@ class Embarcacion implements IUpdateCascada
 
       $this->updateEnCascada();
 
-      $sentencia = "UPDATE `embarcaciones` SET `nombre` = (?), `rey` = (?), `id_cliente` = (?), `estado` = (?) WHERE id = $this->id";
+      $sentencia = "UPDATE `embarcaciones` SET `nombre` = :nombre, `rey` = :rey, `id_cliente` = :id_cliente, `estado` = :estado WHERE id = $this->id";
       $update = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->nombre, $this->rey, $this->id_cliente, $this->estado);
-      $update = $update->execute($datos);
+      $update = $update->execute([
+        ":nombre" => $this->nombre,
+        ":rey" => $this->rey,
+        ":id_cliente" => $this->id_cliente,
+        ":estado" => $this->estado
+      ]);
 
       return $update;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
   /**
    * Implementación de IDeleteCascada
+   * 
+   * Se consulta por el estado de la embarcacion, asumiendo que si es 0 (se quiere dar de baja) se debe:
+   * -Desocupar las amarras en las que se encontraban la embarcacion
    */
   public function updateEnCascada()
   {
     if ($this->estado == 0) {
-      /**  
-       * Si el estado es == 0 significa que se dio de baja la embarcación, por lo tanto también debería de
-       * darse de baja en la amarra en la que se encontraba (movimiento)
-       * Si o si debería de estar ocupado, sino no se estaría dando de baja
-       */
+      $movimiento = Movimiento::selectEmbarcado($this->id);
+      Movimiento::updateMovimiento($movimiento);
+
+      // Una vez desocupada la embarcacion también desocupamos la amarra y actualizamos la BD
+      $amarraADesocupar = Amarra::selectAmarraById($movimiento->id_amarra);
+      $amarraADesocupar = new Amarra(
+        $amarraADesocupar->id,
+        $amarraADesocupar->pasillo,
+        $amarraADesocupar->estado
+      );
+      $amarraADesocupar->setEstado(0);
+      $amarraADesocupar->updateAmarra();
     }
   }
 
@@ -78,14 +103,6 @@ class Embarcacion implements IUpdateCascada
     }
   }
 
-  public function __call($name, $arguments)
-  {
-    echo "<br>$name no está definido";
-    foreach ($arguments as $arg) {
-      echo "<br>parametro: $arg";
-    }
-  }
-
   /**
    * Se obtiene la embarcacion que coincida con el id pasado por parámetro. 
    * @param int $id Id de la embarcación que se desea buscar
@@ -95,24 +112,26 @@ class Embarcacion implements IUpdateCascada
   public static function selectEmbarcacionById(int $id)
   {
     try {
-      $sentencia = "SELECT * FROM `embarcaciones` WHERE id = $id";
+      $sentencia = "SELECT * FROM `embarcaciones` WHERE id = $id LIMIT 1";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
   public static function selectEmbarcacionByRey(string $rey)
   {
     try {
-      $sentencia = "SELECT * FROM `embarcaciones` WHERE rey = $rey";
+      $sentencia = "SELECT * FROM `embarcaciones` WHERE rey = $rey LIMIT 1";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -128,6 +147,7 @@ class Embarcacion implements IUpdateCascada
       }
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -146,6 +166,7 @@ class Embarcacion implements IUpdateCascada
       return $select->fetchAll();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -158,6 +179,7 @@ class Embarcacion implements IUpdateCascada
       return $select->fetchAll();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -166,21 +188,25 @@ class Embarcacion implements IUpdateCascada
     try {
       if ($this->seRepiteRey()) return false;
 
-      $sentencia = "INSERT INTO `embarcaciones` (`nombre`, `rey`, `id_cliente`, `estado`) VALUES (?,?,?,?)";
+      $sentencia = "INSERT INTO `embarcaciones` (`nombre`, `rey`, `id_cliente`, `estado`) VALUES (:nombre,:rey,:id_cliente,:estado)";
       $insert = Conexion::getConexion()->prepare($sentencia);
-      // El 1 en estado es porque está activo
-      $datos = array($this->nombre, $this->rey, $this->id_cliente, 1);
-      $insert = $insert->execute($datos);
+      $insert = $insert->execute([
+        ":nombre" => $this->nombre,
+        ":rey" => $this->rey,
+        ":id_cliente" => $this->id_cliente,
+        ":estado" => $this->estado
+      ]);
       $this->id = Conexion::getConexion()->lastInsertId();
 
       return $insert;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
   /**
-   * Busca si hay un REY repetido en la base de datos. Si es repetido devuelve true, si no false
+   * Busca si hay un REY repetido en la base de datos.
    * @return boolean 
    */
   private function seRepiteRey(): bool
@@ -208,43 +234,13 @@ class Embarcacion implements IUpdateCascada
     $this->estado = $estado;
   }
 
-  /**
-   * Get the value of id
-   */
-  public function getId()
-  {
-    return $this->id;
-  }
+  // Cuando se llama a una funcion que no existe
 
-  /**
-   * Get the value of nombre
-   */
-  public function getNombre()
-  {
-    return $this->nombre;
-  }
-
-  /**
-   * Get the value of rey
-   */
-  public function getRey()
-  {
-    return $this->rey;
-  }
-
-  /**
-   * Get the value of id_cliente
-   */
-  public function getId_cliente()
-  {
-    return $this->id_cliente;
-  }
-
-  /**
-   * Get the value of estado
-   */
-  public function getEstado()
-  {
-    return $this->estado;
-  }
+  // public function __call($name, $arguments)
+  // {
+  //   echo "<br>$name no está definido";
+  //   foreach ($arguments as $arg) {
+  //     echo "<br>parametro: $arg";
+  //   }
+  // }
 }

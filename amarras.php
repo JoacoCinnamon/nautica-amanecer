@@ -2,8 +2,7 @@
 <?php include('./src/procesarAmarras.php'); ?>
 
 <div class="row justify-content-center">
-
-  <script src="./public/js/validarAmarras.js"></script>
+  <script defer src="./public/js/validarAmarras.js"></script>
 
   <form name="amarras" id="formAmarras" action="amarras.php" method="POST" class="col-md-4 py-3">
 
@@ -14,7 +13,7 @@
       <div class="card-body">
 
         <div class="form-floating mb-3">
-          <input type="number" class="form-control" name="pasillo" value="<?= $pasillo; ?>" id="pasillo">
+          <input type="number" class="form-control" name="pasillo" value="<?php print $pasillo; ?>" id="pasillo">
           <label for="floatingNombre">Pasillo</label>
         </div>
 
@@ -52,16 +51,14 @@
               <option value="0">Lista de amarras</option>
               <?php
               $amarras = Amarra::selectAllAmarras();
-              foreach ((array) $amarras as $amarraActual) {
-                ($amarraActual->estado == 0)
-                  ? $estadoString = "(Libre)"
-                  : $estadoString = "(Ocupada)";
+              foreach ((array) $amarras as $amarraActual) :
+                $estadoString = getEstadoToString($amarraActual);
               ?>
-                <option value="<?php echo $amarraActual->id; ?>" <?php if ($id == $amarraActual->id) print "selected"; ?>>
-                  <?php echo "N°$amarraActual->id - Pasillo $amarraActual->pasillo - Estado: $estadoString" ?> </option>
-              <?php } ?>
+                <option value="<?= $amarraActual->id; ?>" <?php if ($id == $amarraActual->id) print "selected"; ?>>
+                  <?= "N°$amarraActual->id - Pasillo $amarraActual->pasillo - Estado: ($estadoString)" ?> </option>
+              <?php endforeach ?>
             </select>
-            <button class="btn btn-outline-secondary" name="selectAmarras" <?php if (!$amarras) echo "disabled"; ?> type="sumbit">Elegir</button>
+            <button class="btn btn-outline-secondary" name="selectAmarras" <?php if (!$amarras) print "disabled"; ?> type="sumbit">Elegir</button>
           </div>
 
         </div>

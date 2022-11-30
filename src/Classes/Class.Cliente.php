@@ -4,14 +4,59 @@ require_once('Class.Conexion.php');
 require_once('Class.Embarcacion.php');
 require_once('./src/Interfaces/IUpdateCascada.php');
 
+/**
+ * Clientes del sistema.
+ */
 class Cliente implements IUpdateCascada
 {
+  /**
+   * Id del cliente (PK).
+   *
+   * @var integer
+   */
   private int $id;
+
+  /**
+   * Apellido y nombre.
+   *
+   * @var string
+   */
   private string $apellido_nombre;
+
+  /**
+   * Email.
+   *
+   * @var string
+   */
   private string $email;
+
+  /**
+   * DNI.
+   *
+   * @var integer
+   */
   private int $dni;
+
+  /**
+   * Número de celular
+   *
+   * @var string
+   */
   private string $movil;
+
+  /**
+   * Dirección completa del domicilio
+   *
+   * @var string
+   */
   private string $domicilio;
+
+  /**
+   * Estado del cliente.
+   * 1 = activo, 0 = baja
+   *
+   * @var integer
+   */
   private int $estado;
 
   /**
@@ -19,7 +64,7 @@ class Cliente implements IUpdateCascada
    * @throws PDOException
    * @return boolean True si se eliminó, false si no se eliminó 
    */
-  private function deleteCliente(): bool
+  private function deleteCliente()
   {
     try {
       $sentencia = "DELETE FROM `clientes` WHERE id = (?)";
@@ -30,6 +75,7 @@ class Cliente implements IUpdateCascada
       return $delete;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -45,33 +91,41 @@ class Cliente implements IUpdateCascada
 
       $this->updateEnCascada();
 
-      $sentencia = "UPDATE `clientes` SET `apellido_nombre` = (?), `email` = (?), `dni` = (?), `movil` = (?), `domicilio` = (?), `estado` = (?)  
+      $sentencia =
+        "UPDATE `clientes` SET `apellido_nombre` = :apellido_nombre, `email` = :email, `dni` = :dni, `movil` = :movil, `domicilio` = :domicilio, `estado` = :estado  
       WHERE id = $this->id";
       $update = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->apellido_nombre, $this->email, $this->dni, $this->movil, $this->domicilio, $this->estado);
-      $update = $update->execute($datos);
+      $update = $update->execute([
+        ":apellido_nombre" => $this->apellido_nombre,
+        ":email" => $this->email,
+        ":dni" => $this->dni,
+        ":movil" => $this->movil,
+        ":domicilio" => $this->domicilio,
+        ":estado" => $this->estado
+      ]);
 
       return $update;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
   /**
    * Implementación de IDeleteCascada
+   * 
+   * Se consulta por el estado del cliente, asumiendo que si es 0 (se quiere dar de baja) se debe:
+   * -Dar de baja al cliente y la/las embarcaciones a su nombre
+   * 
+   * @return void
    */
   public function updateEnCascada()
   {
     if ($this->estado == 0) {
       $embarcacionesCliente = Embarcacion::selectEmbarcacionesByCliente($this->id);
       // Si hay embarcaciones de este cliente
-      foreach ($embarcacionesCliente as $embarcacionActual) {
+      foreach ((array) $embarcacionesCliente as $embarcacionActual) {
         $embarcacionActual = new Embarcacion(
-          /**
-           * Harckodeo una nueva embarcación porque PHP me castea a $embarcacionActual a stdClass y no a una Embarcacion.
-           * Por lo que la primera solución que se me ocurre es re-instanciarla como Embarcacion con los datos que contiene, porque
-           * si contiene las propiedades que tiene una embarcación pero al ser de tipo stdClass no puede acceder a los métodos de Embarcacion
-           */
           $embarcacionActual->id,
           $embarcacionActual->nombre,
           $embarcacionActual->rey,
@@ -84,10 +138,10 @@ class Cliente implements IUpdateCascada
     }
   }
 
-  public function setEstado($estado)
-  {
-    $this->estado = $estado;
-  }
+  // public function setEstado($estado)
+  // {
+  //   $this->estado = $estado;
+  // }
 
   /**
    * Se obtiene el cliente que coincida con el id pasado por parámetro. 
@@ -98,12 +152,13 @@ class Cliente implements IUpdateCascada
   public static function selectClienteById(int $id)
   {
     try {
-      $sentencia = "SELECT * FROM `clientes` WHERE id = $id";
+      $sentencia = "SELECT * FROM `clientes` WHERE id = $id LIMIT 1";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -116,12 +171,13 @@ class Cliente implements IUpdateCascada
   public function selectClienteByDNI(int $dni)
   {
     try {
-      $sentencia = "SELECT * FROM `clientes` WHERE dni = $dni";
+      $sentencia = "SELECT * FROM `clientes` WHERE dni = $dni LIMIT 1";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -134,15 +190,17 @@ class Cliente implements IUpdateCascada
   public static function selectClientesByEstado(int $estado): array
   {
     try {
+      // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
       if ($estado == 0 || $estado == 1) {
-        // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
         $sentencia = "SELECT * FROM `clientes` WHERE estado = $estado ORDER BY id";
         $select = Conexion::getConexion()->query($sentencia);
 
         return $select->fetchAll();
       }
+      return [];
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -160,6 +218,7 @@ class Cliente implements IUpdateCascada
       return $select->fetchAll();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
@@ -174,21 +233,28 @@ class Cliente implements IUpdateCascada
       // Si el DNI ya existe en la base de datos se devuevle para que no deje ingresar DNI repetido.
       if ($this->seRepiteDni()) return false;
 
-      $sentencia = "INSERT INTO `clientes` (`apellido_nombre`, `email`, `dni`, `movil`, `domicilio`, `estado`) VALUES (?,?,?,?,?,?)";
+      $sentencia =
+        "INSERT INTO `clientes` (`apellido_nombre`, `email`, `dni`, `movil`, `domicilio`, `estado`) VALUES (:apellido_nombre,:email,:dni,:movil,:domicilio,:estado)";
       $insert = Conexion::getConexion()->prepare($sentencia);
-      // Estado 1 porque siempre es activo en el alta
-      $datos = array($this->apellido_nombre, $this->email, $this->dni, $this->movil, $this->domicilio, 1);
-      $insert = $insert->execute($datos);
+      $insert = $insert->execute([
+        ":apellido_nombre" => $this->apellido_nombre,
+        ":email" => $this->email,
+        ":dni" => $this->dni,
+        ":movil" => $this->movil,
+        ":domicilio" => $this->domicilio,
+        ":estado" => $this->estado
+      ]);
       $this->id = Conexion::getConexion()->lastInsertId();
 
       return $insert;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
+      die();
     }
   }
 
   /**
-   * Busca si el DNI del objeto Cliente es repetido en la base de datos. Si es repetido devuelve true, si no false
+   * Busca si el DNI del objeto Cliente es repetido en la base de datos. 
    * @return boolean 
    */
   private function seRepiteDni(): bool
@@ -216,36 +282,5 @@ class Cliente implements IUpdateCascada
     $this->movil = $movil;
     $this->domicilio = $domicilio;
     $this->estado = $estado;
-  }
-
-
-  public function getId()
-  {
-    return $this->id;
-  }
-
-  public function getApellidoNombre()
-  {
-    return $this->apellido_nombre;
-  }
-
-  public function getEmail()
-  {
-    return $this->email;
-  }
-
-  public function getDni()
-  {
-    return $this->dni;
-  }
-
-  public function getMovil()
-  {
-    return $this->movil;
-  }
-
-  public function getDomicilio()
-  {
-    return $this->domicilio;
   }
 }

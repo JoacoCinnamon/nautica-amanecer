@@ -39,10 +39,14 @@ if (isset($_POST["botonAmarras"]) && $seTipeoUnPasillo) {
 
 if ($seSeleccionoAmarra) {
   $amarra = Amarra::selectAmarraById($_POST["idAmarra"]);
-  # Si existe
   if ($amarra) {
     $id = $amarra->id;
     $pasillo = $amarra->pasillo;
     $estado = $amarra->estado;
   }
+}
+
+function getEstadoToString($amarra): string
+{
+  return ($amarra->estado == 0) ? "Libre" : "Ocupado";
 }

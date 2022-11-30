@@ -1,22 +1,24 @@
 <?php include('./public/templates/header.php'); ?>
 
+<?php
+define("DIR", "./public/img/DALLE/");
+$imagenesInicio = array_slice(scandir(DIR), 2);
+?>
+
+
 <div class="container px-4 px-lg-5 h-100">
   <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center text-center">
     <div class="col-lg-8 align-self-end">
 
       <div id="carouselIndex" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
-          <?php
-          define("DIR", "./public/img/DALLE/");
-          $imagenesInicio = scandir(DIR);
-          ?>
           <div class="carousel-item active">
-            <img src="<?= DIR . $imagenesInicio[2] ?>" class="d-block w-100" alt="Imagen Náutica 1">
+            <img src="<?= DIR . $imagenesInicio[0] ?>" class="d-block w-100" alt="Imagen Náutica 1">
           </div>
           <?php
           for ($i = 1; $i < sizeof($imagenesInicio) - 1; $i++) {
             if ($imagenesInicio[$i] != "." && $imagenesInicio[$i] != "..") { ?>
-              <div class="carousel-item">
+              <div class="carousel-item opacity-50">
                 <img src="<?= DIR . $imagenesInicio[$i] ?>" class="d-block w-100" alt="<?= "Imagen Náutica " . $i - 1; ?>">
               </div>
           <?php

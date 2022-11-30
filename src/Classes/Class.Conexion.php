@@ -7,7 +7,7 @@ class Conexion
   private const HOST_NAME = "localhost";
   private const HOST_USER = "root";
   private const HOST_PASS = "";
-  // $pdo === $instancia
+  // $pdo == $instancia
   public static $pdo = null;
 
   private function __construct()
@@ -15,7 +15,7 @@ class Conexion
   }
 
   // Singleton instance
-  public static function getConexion()
+  public static function getConexion(): PDO
   {
     try {
       if (self::$pdo == null) {
@@ -34,7 +34,7 @@ class Conexion
 
       return self::$pdo;
     } catch (PDOException $e) {
-      throw new Exception("Error al inicializar conexion: " . $e->getMessage());
+      throw new PDOException("Error al inicializar conexion: " . $e->getMessage());
     }
   }
 }
