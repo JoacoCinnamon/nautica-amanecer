@@ -11,9 +11,51 @@ function procesarInput($cadena)
   return $cadena;
 }
 
+function getEstadoToString($embarcacion): string
+{
+  return ($embarcacion->estado == 1)
+    ? "Activo"
+    : "Baja";
+}
+
+function setAlertAgregar(bool $response, int $rey, string $nombre, string $apellido_nombre): array
+{
+  return $response
+    ? [
+      "msg" => "Se agregó correctamente a '$nombre' - REY: $rey de $apellido_nombre",
+      "icon" => "check-circle-fill",
+      "strong" => "",
+      "status" => "success"
+    ]
+    : [
+      "msg" => "No se pudo agregar a '$nombre' con REY: $rey de $apellido_nombre...  Verifique los campos (no se puede repetir el REY).",
+      "icon" => "exclamation-triangle-fill",
+      "strong" => "AVISO:",
+      "status" => "danger"
+    ];
+}
+
+function setAlertEditar(bool $response, int $rey, string $nombre, string $apellido_nombre): array
+{
+  return $response
+    ? [
+      "msg" => "Se actualizó correctamente a '$nombre' - REY: $rey de $apellido_nombre",
+      "icon" => "check-circle-fill",
+      "strong" => "",
+      "status" => "success"
+    ]
+    : [
+      "msg" => "No se pudo actualizar a '$nombre' con REY: $rey de $apellido_nombre...  Verifique los campos (no se puede repetir el REY).",
+      "icon" => "exclamation-triangle-fill",
+      "strong" => "AVISO:",
+      "status" => "danger"
+    ];
+}
+
 $id = $id_cliente = 0;
 $nombre = $rey = "";
 $estado = 1;
+$alert = [];
 
 /**
  * Boton para agregar embarcación
@@ -23,8 +65,9 @@ if (isset($_POST["agregarEmbarcaciones"])) {
   $rey = procesarInput($_POST["rey"]);
   $id_cliente = $_POST["idCliente"];
 
-  $embarcacion = new Embarcacion(0, $nombre, $rey, $id_cliente, 1);
-  $msg = $embarcacion->insertEmbarcacion();
+  $embarcacion = new Embarcacion(0, $nombre, $rey, $id_cliente, $estado);
+  $alert["res"] = $embarcacion->insertEmbarcacion();
+  $alert["res"] = setAlertAgregar($alert["res"], $rey, $nombre, CLiente::selectClienteById($id_cliente)->apellido_nombre);
 
   $id = $id_cliente = 0;
   $nombre = $rey = "";
@@ -39,8 +82,7 @@ if (isset($_GET["id"])) {
   $embarcacion = Embarcacion::selectEmbarcacionById($id);
   if (!$embarcacion) {
     // Si no existe el cliente lo redirijo de nuevo a embarcaciones.php
-    header('Location: 404.php');
-    // No me estaría dejando cambiarle el estado HTTP
+    header('Location: embarcaciones.php');
     exit();
   } else {
     $nombre = $embarcacion->nombre;
@@ -61,17 +103,9 @@ if (isset($_POST["editarEmbarcaciones"])) {
   $estado = $_POST["estado"];
 
   $embarcacion = new Embarcacion($id, $nombre, $rey, $id_cliente, $estado);
-  $msg = $embarcacion->updateEmbarcacion();
-
+  $alert["res"] = $embarcacion->updateEmbarcacion();
+  $alert["res"] = setAlertEditar($alert["res"], $rey, $nombre, CLiente::selectClienteById($id_cliente)->apellido_nombre);
   $id = $id_cliente = 0;
   $nombre = $rey = "";
   $estado = 1;
-}
-
-
-function getEstadoToString($embarcacion): string
-{
-  return ($embarcacion->estado == 1)
-    ? "Activo"
-    : "Baja";
 }

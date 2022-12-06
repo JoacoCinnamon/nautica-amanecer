@@ -67,10 +67,9 @@ class Cliente implements IUpdateCascada
   private function deleteCliente()
   {
     try {
-      $sentencia = "DELETE FROM `clientes` WHERE id = (?)";
+      $sentencia = "DELETE FROM `clientes` WHERE id = :id";
       $delete = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->id);
-      $delete = $delete->execute($datos);
+      $delete = $delete->execute([":id" => $this->id]);
 
       return $delete;
     } catch (PDOException $e) {
@@ -92,8 +91,9 @@ class Cliente implements IUpdateCascada
       $this->updateEnCascada();
 
       $sentencia =
-        "UPDATE `clientes` SET `apellido_nombre` = :apellido_nombre, `email` = :email, `dni` = :dni, `movil` = :movil, `domicilio` = :domicilio, `estado` = :estado  
-      WHERE id = $this->id";
+        "UPDATE `clientes` 
+        SET `apellido_nombre` = :apellido_nombre, `email` = :email, `dni` = :dni, `movil` = :movil, `domicilio` = :domicilio, `estado` = :estado
+        WHERE id = $this->id";
       $update = Conexion::getConexion()->prepare($sentencia);
       $update = $update->execute([
         ":apellido_nombre" => $this->apellido_nombre,
@@ -137,11 +137,6 @@ class Cliente implements IUpdateCascada
       }
     }
   }
-
-  // public function setEstado($estado)
-  // {
-  //   $this->estado = $estado;
-  // }
 
   /**
    * Se obtiene el cliente que coincida con el id pasado por parámetro. 
@@ -190,7 +185,6 @@ class Cliente implements IUpdateCascada
   public static function selectClientesByEstado(int $estado): array
   {
     try {
-      // El estado es un numero pasado por parametro, 0 = baja, 1 = activo
       if ($estado == 0 || $estado == 1) {
         $sentencia = "SELECT * FROM `clientes` WHERE estado = $estado ORDER BY id";
         $select = Conexion::getConexion()->query($sentencia);

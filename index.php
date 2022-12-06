@@ -18,7 +18,7 @@ $imagenesInicio = array_slice(scandir(DIR), 2);
           <?php
           for ($i = 1; $i < sizeof($imagenesInicio) - 1; $i++) {
             if ($imagenesInicio[$i] != "." && $imagenesInicio[$i] != "..") { ?>
-              <div class="carousel-item opacity-50">
+              <div class="carousel-item">
                 <img src="<?= DIR . $imagenesInicio[$i] ?>" class="d-block w-100" alt="<?= "Imagen Náutica " . $i - 1; ?>">
               </div>
           <?php

@@ -9,16 +9,38 @@ require_once('./src/Interfaces/IUpdateCascada.php');
  */
 class Embarcacion implements IUpdateCascada
 {
+  /**
+   * Id de la embarcacion (PK)
+   * @var int
+   */
   private int $id;
 
+  /**
+   * Nombre de la embarcacion
+   * @var string
+   */
   private string $nombre;
 
-  // Como una patente
+  /**
+   * Patente de la embarcacion
+   * @var string
+   */
   private string $rey;
 
+  /**
+   * Id del cliente dueño de la embarcacion
+   * @var int
+   */
   private int $id_cliente;
 
+  /**
+   * Estado de la embarcacion.
+   * 1 = activo, 0 = baja
+   *
+   * @var integer
+   */
   private int $estado;
+
 
   /**
    * Eliminar una embarcacion de la base de datos
@@ -28,10 +50,9 @@ class Embarcacion implements IUpdateCascada
   private function deleteEmbarcacion()
   {
     try {
-      $sentencia = "DELETE FROM `embarcaciones` WHERE id = (?)";
+      $sentencia = "DELETE FROM `embarcaciones` WHERE id = (:id)";
       $delete = Conexion::getConexion()->prepare($sentencia);
-      $datos = array($this->id);
-      $delete = $delete->execute($datos);
+      $delete = $delete->execute([":id" => $this->id]);
 
       return $delete;
     } catch (PDOException $e) {
@@ -72,23 +93,24 @@ class Embarcacion implements IUpdateCascada
    * Implementación de IDeleteCascada
    * 
    * Se consulta por el estado de la embarcacion, asumiendo que si es 0 (se quiere dar de baja) se debe:
-   * -Desocupar las amarras en las que se encontraban la embarcacion
+   * -Desocupar la amarra en la que se encontraban la embarcacion
    */
   public function updateEnCascada()
   {
     if ($this->estado == 0) {
       $movimiento = Movimiento::selectEmbarcado($this->id);
-      Movimiento::updateMovimiento($movimiento);
-
-      // Una vez desocupada la embarcacion también desocupamos la amarra y actualizamos la BD
-      $amarraADesocupar = Amarra::selectAmarraById($movimiento->id_amarra);
-      $amarraADesocupar = new Amarra(
-        $amarraADesocupar->id,
-        $amarraADesocupar->pasillo,
-        $amarraADesocupar->estado
-      );
-      $amarraADesocupar->setEstado(0);
-      $amarraADesocupar->updateAmarra();
+      // Si realmente hay un movimiento
+      if ($movimiento) {
+        Movimiento::updateMovimiento($movimiento);
+        $amarraADesocupar = Amarra::selectAmarraById($movimiento->id_amarra);
+        $amarraADesocupar = new Amarra(
+          $amarraADesocupar->id,
+          $amarraADesocupar->pasillo,
+          $amarraADesocupar->estado
+        );
+        $amarraADesocupar->setEstado(0);
+        $amarraADesocupar->updateAmarra();
+      }
     }
   }
 
@@ -233,14 +255,4 @@ class Embarcacion implements IUpdateCascada
     $this->id_cliente = $id_cliente;
     $this->estado = $estado;
   }
-
-  // Cuando se llama a una funcion que no existe
-
-  // public function __call($name, $arguments)
-  // {
-  //   echo "<br>$name no está definido";
-  //   foreach ($arguments as $arg) {
-  //     echo "<br>parametro: $arg";
-  //   }
-  // }
 }

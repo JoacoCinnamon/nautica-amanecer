@@ -10,10 +10,51 @@ function procesarInput($cadena)
   return $cadena;
 }
 
+function getEstadoToString($cliente): string
+{
+  return ($cliente->estado == 1)
+    ? "Activo"
+    : "Baja";
+}
+
+function setAlertAgregar(bool $response, int $dni, string $apellido_nombre): array
+{
+  return $response
+    ? [
+      "msg" => "Se agregó correctamente a $apellido_nombre - DNI: $dni",
+      "icon" => "check-circle-fill",
+      "strong" => "",
+      "status" => "success"
+    ]
+    : [
+      "msg" => "No se pudo agregar a $apellido_nombre - DNI: $dni... Verifique los campos (no se puede repetir el DNI).",
+      "icon" => "exclamation-triangle-fill",
+      "strong" => "AVISO:",
+      "status" => "danger"
+    ];
+}
+
+function setAlertEditar(bool $response, int $dni, string $apellido_nombre): array
+{
+  return $response
+    ? [
+      "msg" => "Se actualizó correctamente a $apellido_nombre - DNI: $dni",
+      "icon" => "check-circle-fill",
+      "strong" => "",
+      "status" => "success"
+    ]
+    : [
+      "msg" => "No se pudo actualizar a $apellido_nombre con DNI: $dni... Verifique los campos (no se puede repetir el DNI).",
+      "icon" => "exclamation-triangle-fill",
+      "strong" => "AVISO:",
+      "status" => "danger"
+    ];
+}
+
 $id = 0;
 $apellido_nombre = $email = $dni = $movil = $domicilio = "";
-$modal_apellido_nombre = $modal_email = $modal_dni = $modal_movil = $modal_domicilio = "";
 $estado = 1;
+$alert = [];
 
 
 /**
@@ -27,7 +68,9 @@ if (isset($_POST["agregarClientes"])) {
   $domicilio = procesarInput($_POST["domicilio"]);
 
   $cliente = new Cliente(0, $apellido_nombre, $email, $dni, $movil, $domicilio, $estado);
-  $msg = $cliente->insertCliente();
+  $alert["res"] = $cliente->insertCliente();
+  $alert["res"] = setAlertAgregar($alert["res"], $dni, $apellido_nombre);
+
   $id = 0;
   $apellido_nombre = $email = $dni = $movil = $domicilio = "";
   $estado = 1;
@@ -41,8 +84,7 @@ if (isset($_GET["id"])) {
   $cliente = Cliente::selectClienteById($id);
   if (!$cliente) {
     // Si no existe el cliente lo redirijo de nuevo a clientes.php
-    header('Location: 404.php');
-    // No me estaría dejando cambiarle el estado HTTP
+    header('Location: clientes.php');
     exit();
   } else {
     $apellido_nombre = $cliente->apellido_nombre;
@@ -67,17 +109,10 @@ if (isset($_POST["editarClientes"])) {
   $estado = $_POST["estado"];
 
   $cliente = new Cliente($id, $apellido_nombre, $email, $dni, $movil, $domicilio, $estado);
-  $msg = $cliente->updateCliente();
+  $alert["res"] = $cliente->updateCliente();
+  $alert["res"] = setAlertEditar($alert["res"], $dni, $apellido_nombre);
 
   $id = 0;
   $apellido_nombre = $email = $dni = $movil = $domicilio = "";
   $estado = 1;
-}
-
-
-function getEstadoToString($cliente): string
-{
-  return ($cliente->estado == 1)
-    ? "Activo"
-    : "Baja";
 }

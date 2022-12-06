@@ -30,7 +30,7 @@ class Amarra
   private int $estado;
 
 
-  public function deleteAmarra()
+  private function deleteAmarra()
   {
     try {
       return false;
@@ -43,9 +43,9 @@ class Amarra
   /**
    * Actualiza todo los datos de la amarra en la base de datos
    * @throws PDOException
-   * @return boolean True si se actualizó, false si no 
+   * @return boolean True si se actualizó el cliente a la base de datos, false si no se pudo
    */
-  public function updateAmarra()
+  public function updateAmarra(): bool
   {
     try {
       $sentencia = "UPDATE `amarras` SET `pasillo` = :pasillo, `estado` = :estado WHERE `id` = $this->id";
@@ -157,7 +157,7 @@ class Amarra
    * @throws PDOException
    * @return boolean True si se pudo agregar el cliente a la base de datos, false si no se pudo
    */
-  public function insertAmarra()
+  public function insertAmarra(): bool
   {
     try {
       $sentencia = "INSERT INTO `amarras` (`pasillo`, `estado`) VALUES (:pasillo,:estado)";

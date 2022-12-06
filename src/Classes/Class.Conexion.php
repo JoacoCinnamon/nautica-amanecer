@@ -7,7 +7,11 @@ class Conexion
   private const HOST_NAME = "localhost";
   private const HOST_USER = "root";
   private const HOST_PASS = "";
-  // $pdo == $instancia
+
+  /**
+   * Summary of pdo
+   * @var PDO
+   */
   public static $pdo = null;
 
   private function __construct()

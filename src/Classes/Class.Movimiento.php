@@ -45,6 +45,20 @@ class Movimiento
    */
   private string $fecha_hasta;
 
+  private static function deleteMovimiento($movimiento)
+  {
+    try {
+      $sentencia = "DELETE FROM `embarcacion-amarra` WHERE id = (:id)";
+      $delete = Conexion::getConexion()->prepare($sentencia);
+      $delete = $delete->execute([":id" => $movimiento->id]);
+
+      return $delete;
+    } catch (PDOException $e) {
+      echo "ERROR: " . $e->getMessage();
+      die();
+    }
+  }
+
   public static function updateMovimiento($movimiento)
   {
     try {
@@ -117,7 +131,7 @@ class Movimiento
   public static function selectAllMovimientos(): array
   {
     try {
-      $sentencia = "SELECT * FROM `embarcacion-amarra` ORDER BY id DESC";
+      $sentencia = "SELECT * FROM `embarcacion-amarra` ORDER BY fecha_desde DESC, fecha_hasta ASC"; // ID DESC
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
@@ -133,7 +147,7 @@ class Movimiento
     try {
       $movimiento = Movimiento::selectEmbarcado($this->id_embarcacion);
 
-      // Si está embarcado (osea trae un registro) y se quiere agregar otro movimiento del mismo barco significa que la quiere mover
+      // Si está embarcado (osea trae un registro) y se quiere agregar otro movimiento del mismo barco significa que lo quiere mover
       // asi que tenemos que desocupar la antigua amarra y actualizar la fecha_hasta 
       if ($movimiento) {
         Movimiento::updateMovimiento($movimiento);
