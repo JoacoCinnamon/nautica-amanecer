@@ -73,6 +73,15 @@ class Movimiento
         ":fecha_hasta" => date('Y-m-d', strtotime("today"))
       ]);
 
+      $amarraADesocupar = Amarra::selectAmarraById($movimiento->id_amarra);
+      $amarraADesocupar = new Amarra(
+        $amarraADesocupar->id,
+        $amarraADesocupar->pasillo,
+        $amarraADesocupar->estado
+      );
+      $amarraADesocupar->setEstado(0);
+      $amarraADesocupar->updateAmarra();
+
       return $update;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();

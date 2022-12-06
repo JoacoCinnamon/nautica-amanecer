@@ -99,17 +99,9 @@ class Embarcacion implements IUpdateCascada
   {
     if ($this->estado == 0) {
       $movimiento = Movimiento::selectEmbarcado($this->id);
-      // Si realmente hay un movimiento
+      // Si realmente hay un movimiento, por lo tanto esta embarcacion está embarcada
       if ($movimiento) {
         Movimiento::updateMovimiento($movimiento);
-        $amarraADesocupar = Amarra::selectAmarraById($movimiento->id_amarra);
-        $amarraADesocupar = new Amarra(
-          $amarraADesocupar->id,
-          $amarraADesocupar->pasillo,
-          $amarraADesocupar->estado
-        );
-        $amarraADesocupar->setEstado(0);
-        $amarraADesocupar->updateAmarra();
       }
     }
   }
