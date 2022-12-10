@@ -1,6 +1,5 @@
 <?php include('./public/templates/header.php'); ?>
 <?php include('./src/procesarMovimientos.php'); ?>
-
 <div class="col-12 py-4">
   <script defer src="./public/js/validarMovimientos.js"></script>
 

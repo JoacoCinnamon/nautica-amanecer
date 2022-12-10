@@ -8,7 +8,7 @@ function parsearFecha(string $fecha): string
   $fechaParseada = date("d/m/Y", $timestamp);
   return ($fecha == "0000-00-00")
     ? "Vigente"
-    : $fechaParseada;
+    : $fecha;
 }
 
 function setAlertAgregar(bool $response, int $id_embarcacion, int $id_amarra, string $fecha_desde): array

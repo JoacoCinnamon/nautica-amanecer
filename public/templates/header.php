@@ -30,38 +30,16 @@
 </head>
 
 <body>
-  <!-- HEADER -->
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light border-2 border-bottom border-secondary">
-      <!-- También fluid -->
-      <div class="container">
-        <a class="navbar-brand" aria-current="page" href="/Nautica_Amanecer"> <img src="./public/img/logo.png" alt="Logo" width="150px" class="d-inline-block align-text-top">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav ms-auto">
-            <li>
-              <a class="nav-link" href="clientes.php">Clientes</a>
-            </li>
-            <li>
-              <a class="nav-link" href="embarcaciones.php">Embarcaciones</a>
-            </li>
-            <li>
-              <a class="nav-link" href="amarras.php">Amarras</a>
-            </li>
-            <li>
-              <a class="nav-link" href="movimientos.php">Movimientos</a>
-            </li>
-          </div>
-        </div>
+  <!-- Contenido Stático del index (responsivo) -->
+  <link rel="stylesheet" href="./public/css/index.css" />
+  <?php $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH) ?>
+  <?php if ($uri == "/Nautica_Amanecer/" || $uri == "/Nautica_Amanecer/index.php") : ?>
+    <script defer src="./public/js/welcome.js"></script>
+  <?php endif ?>
 
-      </div>
-    </nav>
-  </header>
+  <!-- Navbar -->
+  <?php include('./public/templates/navbar.php'); ?>
+
   <!-- Parte de arriba de todos los bodys -->
   <div class="container py-3">
-    <!-- <div class="row">
-      <div class="col-12 py-3"> -->
