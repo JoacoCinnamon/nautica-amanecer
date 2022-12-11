@@ -13,13 +13,11 @@ function setAlertAgregar(bool $response, int $id, int $pasillo): array
   return $response
     ? [
       "msg" => "Se agregó correctamente la amarra N° $id en el pasillo $pasillo",
-      "icon" => "check-circle-fill",
       "strong" => "",
       "status" => "success"
     ]
     : [
       "msg" => "No se pudo agregar la amarra...",
-      "icon" => "exclamation-triangle-fill",
       "strong" => "AVISO:",
       "status" => "danger"
     ];

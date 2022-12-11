@@ -22,13 +22,11 @@ function setAlertAgregar(bool $response, int $dni, string $apellido_nombre): arr
   return $response
     ? [
       "msg" => "Se agregó correctamente a $apellido_nombre - DNI: $dni",
-      "icon" => "check-circle-fill",
       "strong" => "",
       "status" => "success"
     ]
     : [
       "msg" => "No se pudo agregar a $apellido_nombre - DNI: $dni... Verifique los campos (no se puede repetir el DNI).",
-      "icon" => "exclamation-triangle-fill",
       "strong" => "AVISO:",
       "status" => "danger"
     ];

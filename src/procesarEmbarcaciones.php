@@ -23,13 +23,11 @@ function setAlertAgregar(bool $response, int $rey, string $nombre, string $apell
   return $response
     ? [
       "msg" => "Se agregó correctamente a '$nombre' - REY: $rey de $apellido_nombre",
-      "icon" => "check-circle-fill",
       "strong" => "",
       "status" => "success"
     ]
     : [
       "msg" => "No se pudo agregar a '$nombre' con REY: $rey de $apellido_nombre...  Verifique los campos (no se puede repetir el REY).",
-      "icon" => "exclamation-triangle-fill",
       "strong" => "AVISO:",
       "status" => "danger"
     ];
@@ -40,13 +38,11 @@ function setAlertEditar(bool $response, int $rey, string $nombre, string $apelli
   return $response
     ? [
       "msg" => "Se actualizó correctamente a '$nombre' - REY: $rey de $apellido_nombre",
-      "icon" => "check-circle-fill",
       "strong" => "",
       "status" => "success"
     ]
     : [
       "msg" => "No se pudo actualizar a '$nombre' con REY: $rey de $apellido_nombre...  Verifique los campos (no se puede repetir el REY).",
-      "icon" => "exclamation-triangle-fill",
       "strong" => "AVISO:",
       "status" => "danger"
     ];

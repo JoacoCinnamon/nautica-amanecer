@@ -19,13 +19,11 @@ function setAlertAgregar(bool $response, int $id_embarcacion, int $id_amarra, st
   return $response
     ? [
       "msg" => "Se ha generado correctamente el movimiento. Se registró a '$embarcacion->nombre' - REY: $embarcacion->rey en la amarra N°$amarra->id desde el $fecha_desde...",
-      "icon" => "check-circle-fill",
       "strong" => "",
       "status" => "success"
     ]
     : [
       "msg" => "No se pudo generar el movimiento...",
-      "icon" => "exclamation-triangle-fill",
       "strong" => "AVISO:",
       "status" => "danger"
     ];
