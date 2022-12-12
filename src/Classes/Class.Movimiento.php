@@ -10,41 +10,34 @@ require_once('./src/Interfaces/IUpdateCascada.php');
  */
 class Movimiento
 {
-  /**
-   * Id del Movimiento (PK).
-   *
-   * @var integer
-   */
   private int $id;
 
   /**
    * Id de la embarcacion.
-   *
-   * @var integer
    */
   private int $id_embarcacion;
 
   /**
    * Id de la amarra.
-   *
-   * @var integer
    */
   private int $id_amarra;
 
   /**
-   * Fecha de desde cuándo la embarcación está ocupando la amarra.
-   *
-   * @var string
+   * Fecha desde cuándo la embarcación está ocupando la amarra.
    */
   private string $fecha_desde;
 
   /**
-   * Fecha en la que se desocupo la amarra junto a la embarcación.
-   *
-   * @var string
+   * Fecha en la que se desocupó la amarra junto a la embarcación.
    */
   private string $fecha_hasta;
 
+
+  /**
+   * Eliminar un movimiento de la base de datos
+   * @throws PDOException
+   * @return boolean
+   */
   private static function deleteMovimiento($movimiento)
   {
     try {
@@ -59,6 +52,11 @@ class Movimiento
     }
   }
 
+  /**
+   * Actualizar un movimiento de la base de datos
+   * @throws PDOException
+   * @return boolean
+   */
   public static function updateMovimiento($movimiento)
   {
     try {
@@ -90,7 +88,8 @@ class Movimiento
   }
 
   /**
-   * Consulta a la DB con el id de la embarcacion pasado por parámetro para obt 
+   * Consulta a la DB con el id de la embarcacion pasado por parámetro para obtener
+   * si está embarcada actualmente 
    *
    * @param integer $id_embarcacion Id de la embarcacion que deseamos saber desde cuando y donde está embarcada
    * @return Movimiento|boolean
@@ -98,7 +97,8 @@ class Movimiento
   public static function selectEmbarcado(int $id_embarcacion)
   {
     try {
-      $sentencia = "SELECT * FROM `embarcacion-amarra` WHERE `id_embarcacion` = $id_embarcacion AND `fecha_hasta` = '0000-00-00' LIMIT 1";
+      $sentencia = "SELECT * FROM `embarcacion-amarra` 
+      WHERE `id_embarcacion` = $id_embarcacion AND `fecha_hasta` = '0000-00-00' LIMIT 1";
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
@@ -108,6 +108,32 @@ class Movimiento
     }
   }
 
+  /**
+   * Consulta a la DB con el id de la amarra pasada por parámetro para obtener
+   * si está ocupada actualmente 
+   *
+   * @param integer $id_amarra Id de la embarcacion que deseamos saber desde cuando y donde está embarcada
+   * @return Movimiento|boolean
+   */
+  public static function selectOcupado(int $id_amarra)
+  {
+    try {
+      $sentencia = "SELECT * FROM `embarcacion-amarra` 
+      WHERE `id_amarra` = $id_amarra AND `fecha_hasta` = '0000-00-00' LIMIT 1";
+      $select = Conexion::getConexion()->query($sentencia);
+
+      return $select->fetch();
+    } catch (PDOException $e) {
+      echo "ERROR: " . $e->getMessage();
+      die();
+    }
+  }
+
+  /**
+   * Se obtiene una lista de los movimientos vigentes (osea donde realmente están ocupados).
+   * @throws PDOException
+   * @return array<Movimiento>|boolean
+   */
   public static function selectEmbarcados()
   {
     try {
@@ -121,6 +147,12 @@ class Movimiento
     }
   }
 
+  /**
+   * Se obtiene el movimiento que coincida con el id pasado por parámetro. 
+   * @param int $id Id del movimiento que se desea buscar
+   * @throws PDOException
+   * @return Movimiento|boolean Cliente que coincida con el id pasado por parámetro, falso si falla.
+   */
   public static function selectMovimientoById(int $id)
   {
     try {
@@ -135,7 +167,9 @@ class Movimiento
   }
 
   /**
-   * @return array<Movimiento>
+   * Se obtiene una lista de todos los movimientos.
+   * @throws PDOException
+   * @return array<Movimiento>|boolean
    */
   public static function selectAllMovimientos(): array
   {
@@ -150,7 +184,11 @@ class Movimiento
     }
   }
 
-
+  /**
+   * Crea en la base de datos un nuevo movimiento con los datos del objeto Movimiento 
+   * @throws PDOException
+   * @return boolean True si se pudo agregar el movimiento a la base de datos, false si no se pudo
+   */
   public function insertMovimiento()
   {
     try {
@@ -161,7 +199,8 @@ class Movimiento
       if ($movimiento) {
         Movimiento::updateMovimiento($movimiento);
       }
-      $sentencia = "INSERT INTO `embarcacion-amarra` (`id_embarcacion`, `id_amarra`,`fecha_desde`, `fecha_hasta`) VALUES (:id_embarcacion,:id_amarra,:fecha_desde,:fecha_hasta)";
+      $sentencia = "INSERT INTO `embarcacion-amarra` (`id_embarcacion`, `id_amarra`,`fecha_desde`, `fecha_hasta`) 
+      VALUES (:id_embarcacion,:id_amarra,:fecha_desde,:fecha_hasta)";
       $insert = Conexion::getConexion()->prepare($sentencia);
       $insert = $insert->execute([
         ":id_embarcacion" => $this->id_embarcacion,

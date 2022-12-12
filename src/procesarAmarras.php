@@ -12,7 +12,7 @@ function setAlertAgregar(bool $response, int $id, int $pasillo): array
 {
   return $response
     ? [
-      "msg" => "Se agregó correctamente la amarra N° $id en el pasillo $pasillo",
+      "msg" => "Se agregó correctamente la amarra N° $id en el pasillo $pasillo.",
       "strong" => "",
       "status" => "success"
     ]
@@ -27,14 +27,27 @@ function setAlertEditar(bool $response, int $id, int $pasillo): array
 {
   return $response
     ? [
-      "msg" => "Se actualizó la amarra N° $id en el pasillo $pasillo",
-      "icon" => "check-circle-fill",
+      "msg" => "Se actualizó la amarra N° $id en el pasillo $pasillo.",
       "strong" => "",
       "status" => "success"
     ]
     : [
       "msg" => "No se pudo actualizar la amarra...",
-      "icon" => "exclamation-triangle-fill",
+      "strong" => "AVISO:",
+      "status" => "danger"
+    ];
+}
+
+function setAlertEliminar(bool $response, int $id, int $pasillo): array
+{
+  return $response
+    ? [
+      "msg" => "Se eliminó correctamente la amarra N° $id en el pasillo $pasillo.",
+      "strong" => "",
+      "status" => "success"
+    ]
+    : [
+      "msg" => "No se pudo eliminar la amarra...",
       "strong" => "AVISO:",
       "status" => "danger"
     ];
@@ -69,7 +82,8 @@ if (isset($_POST["botonAmarras"]) && $seTipeoUnPasillo) {
     $alert["res"] = $amarra->updateAmarra();
     $alert["res"] = setAlertEditar($alert["res"], $id, $pasillo);
   } else {
-    // Borrar amarra ? NO SE PUEDEN BORRAR
+    $alert["res"] = $amarra->deleteAmarra();
+    $alert["res"] = setAlertEliminar($alert["res"], $id, $pasillo);
   }
 
   $id = $pasillo = $estado =  0;

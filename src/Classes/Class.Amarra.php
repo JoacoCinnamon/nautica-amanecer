@@ -1,39 +1,42 @@
 <?php
 
 require_once('Class.Conexion.php');
+require_once('Class.Movimiento.php');
 
 /**
  * Amarra donde se almacenan embarcaciones.
  */
 class Amarra
 {
-  /**
-   * Id de la amarra (PK).
-   *
-   * @var integer
-   */
   private int $id;
 
-  /**
-   * Pasillo en el que se encuentra la amarra.
-   *
-   * @var integer
-   */
+
   private int $pasillo;
 
   /**
    * Estado actual de la amarra.
    * 0 = libre, 1 = ocupada 
-   *
-   * @var integer
    */
   private int $estado;
 
-
-  private function deleteAmarra()
+  /**
+   * Eliminar una amarra de la base de datos
+   * @throws PDOException
+   * @return boolean
+   */
+  public function deleteAmarra()
   {
     try {
-      return false;
+      // Si esta amarra actualmente está ocupada
+      if (Movimiento::selectOcupado($this->id)) {
+        return false;
+      }
+
+      $sentencia = "DELETE FROM `amarras` WHERE id = :id";
+      $delete = Conexion::getConexion()->prepare($sentencia);
+      $delete = $delete->execute([":id" => $this->id]);
+
+      return $delete;
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
       die();

@@ -9,35 +9,23 @@ require_once('./src/Interfaces/IUpdateCascada.php');
  */
 class Embarcacion implements IUpdateCascada
 {
-  /**
-   * Id de la embarcacion (PK)
-   * @var int
-   */
   private int $id;
 
-  /**
-   * Nombre de la embarcacion
-   * @var string
-   */
   private string $nombre;
 
   /**
-   * Patente de la embarcacion
-   * @var string
+   * Patente de la embarcacion (Campo único)
    */
   private string $rey;
 
   /**
-   * Id del cliente dueño de la embarcacion
-   * @var int
+   * Id del cliente dueño de la embarcación
    */
   private int $id_cliente;
 
   /**
    * Estado de la embarcacion.
    * 1 = activo, 0 = baja
-   *
-   * @var integer
    */
   private int $estado;
 
@@ -45,9 +33,9 @@ class Embarcacion implements IUpdateCascada
   /**
    * Eliminar una embarcacion de la base de datos
    * @throws PDOException
-   * @return boolean True si se eliminó, false si no se eliminó 
+   * @return boolean
    */
-  private function deleteEmbarcacion()
+  public function deleteEmbarcacion()
   {
     try {
       $sentencia = "DELETE FROM `embarcaciones` WHERE id = (:id)";
@@ -62,7 +50,8 @@ class Embarcacion implements IUpdateCascada
   }
 
   /**
-   * SE DEBE DAR DE BAJA LA EMBARCACION Y DESOCUPAR LA RESPECTIVA AMARRA
+   * Actualizar una embarcación de la base de datos
+   * @return bool En principio devuelve true/false
    */
   public function updateEmbarcacion()
   {
@@ -90,6 +79,7 @@ class Embarcacion implements IUpdateCascada
   }
 
   /**
+   * @inheritDoc
    * Implementación de IDeleteCascada
    * 
    * Se consulta por el estado de la embarcacion, asumiendo que si es 0 (se quiere dar de baja) se debe:

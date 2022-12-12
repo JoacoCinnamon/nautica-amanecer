@@ -9,62 +9,33 @@ require_once('./src/Interfaces/IUpdateCascada.php');
  */
 class Cliente implements IUpdateCascada
 {
-  /**
-   * Id del cliente (PK).
-   *
-   * @var integer
-   */
   private int $id;
 
-  /**
-   * Apellido y nombre.
-   *
-   * @var string
-   */
   private string $apellido_nombre;
 
-  /**
-   * Email.
-   *
-   * @var string
-   */
   private string $email;
 
   /**
-   * DNI.
-   *
-   * @var integer
+   * Campo único
    */
   private int $dni;
 
-  /**
-   * Número de celular
-   *
-   * @var string
-   */
   private string $movil;
 
-  /**
-   * Dirección completa del domicilio
-   *
-   * @var string
-   */
   private string $domicilio;
 
   /**
    * Estado del cliente.
    * 1 = activo, 0 = baja
-   *
-   * @var integer
    */
   private int $estado;
 
   /**
-   * Eliminar unn cliente de la base de datos
+   * Eliminar un cliente de la base de datos
    * @throws PDOException
-   * @return boolean True si se eliminó, false si no se eliminó 
+   * @return boolean
    */
-  private function deleteCliente()
+  public function deleteCliente()
   {
     try {
       $sentencia = "DELETE FROM `clientes` WHERE id = :id";
@@ -79,7 +50,8 @@ class Cliente implements IUpdateCascada
   }
 
   /**
-   * SE DEBEN DAR DE BAJA LAS EMBARCACIONES TAMBIÉN Y DESOCUPAR LAS RESPECTIVAS AMARRAS
+   * Actualizar un cliente de la base de datos
+   * @return bool En principio devuelve true/false
    */
   public function updateCliente()
   {
@@ -112,6 +84,8 @@ class Cliente implements IUpdateCascada
   }
 
   /**
+   * @inheritDoc
+   * 
    * Implementación de IDeleteCascada
    * 
    * Se consulta por el estado del cliente, asumiendo que si es 0 (se quiere dar de baja) se debe:
@@ -142,7 +116,7 @@ class Cliente implements IUpdateCascada
    * Se obtiene el cliente que coincida con el id pasado por parámetro. 
    * @param int $id Id del cliente que se desea buscar
    * @throws PDOException
-   * @return Cliente Cliente que coincida con el id pasado por parámetro, falso si falla.
+   * @return Cliente|boolean Cliente que coincida con el id pasado por parámetro, falso si falla.
    */
   public static function selectClienteById(int $id)
   {
@@ -161,7 +135,7 @@ class Cliente implements IUpdateCascada
    * Se obtiene el cliente que coincida con el DNI pasado por parámetro. 
    * @param int $dni Dni del cliente que se desea buscar
    * @throws PDOException
-   * @return Cliente Cliente que coincida con el DNI pasado por parámetro, falso si falla.
+   * @return Cliente|boolean Cliente que coincida con el DNI pasado por parámetro, falso si falla.
    */
   public function selectClienteByDNI(int $dni)
   {
@@ -180,7 +154,7 @@ class Cliente implements IUpdateCascada
    * Se obtiene una lista con todos los clientes que tengan el estado pasado por parámetro. 
    * @param int<0,1> $estado Estado del cliente. 0 = baja, 1 = activo
    * @throws PDOException
-   * @return array<Cliente> Lista de todos los clientes con estado baja o activo pasado por parámetro, falso si falla.
+   * @return array<Cliente>|boolean Lista de todos los clientes con estado baja o activo pasado por parámetro, falso si falla.
    */
   public static function selectClientesByEstado(int $estado): array
   {
@@ -201,7 +175,7 @@ class Cliente implements IUpdateCascada
   /**
    * Se obtiene una lista con todos los clientes registrados. 
    * @throws PDOException
-   * @return array<Cliente> Lista de todos los clientes, falso si falla.
+   * @return array<Cliente>|boolean Lista de todos los clientes, falso si falla.
    */
   public static function selectAllClientes(): array
   {

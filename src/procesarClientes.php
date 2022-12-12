@@ -21,7 +21,7 @@ function setAlertAgregar(bool $response, int $dni, string $apellido_nombre): arr
 {
   return $response
     ? [
-      "msg" => "Se agregó correctamente a $apellido_nombre - DNI: $dni",
+      "msg" => "Se agregó correctamente a $apellido_nombre - DNI: $dni.",
       "strong" => "",
       "status" => "success"
     ]
@@ -36,7 +36,7 @@ function setAlertEditar(bool $response, int $dni, string $apellido_nombre): arra
 {
   return $response
     ? [
-      "msg" => "Se actualizó correctamente a $apellido_nombre - DNI: $dni",
+      "msg" => "Se actualizó correctamente a $apellido_nombre - DNI: $dni.",
       "icon" => "check-circle-fill",
       "strong" => "",
       "status" => "success"

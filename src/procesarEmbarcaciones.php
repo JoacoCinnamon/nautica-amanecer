@@ -22,7 +22,7 @@ function setAlertAgregar(bool $response, int $rey, string $nombre, string $apell
 {
   return $response
     ? [
-      "msg" => "Se agregó correctamente a '$nombre' - REY: $rey de $apellido_nombre",
+      "msg" => "Se agregó correctamente a '$nombre' - REY: $rey de $apellido_nombre.",
       "strong" => "",
       "status" => "success"
     ]
@@ -37,7 +37,7 @@ function setAlertEditar(bool $response, int $rey, string $nombre, string $apelli
 {
   return $response
     ? [
-      "msg" => "Se actualizó correctamente a '$nombre' - REY: $rey de $apellido_nombre",
+      "msg" => "Se actualizó correctamente a '$nombre' - REY: $rey de $apellido_nombre.",
       "strong" => "",
       "status" => "success"
     ]

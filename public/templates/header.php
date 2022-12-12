@@ -32,7 +32,6 @@
 <body>
 
   <!-- Contenido Stático del index (responsivo) -->
-  <link rel="stylesheet" href="./public/css/index.css" />
   <?php $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH) ?>
   <?php if ($uri == "/Nautica_Amanecer/" || $uri == "/Nautica_Amanecer/index.php") : ?>
     <script defer src="./public/js/welcome.js"></script>

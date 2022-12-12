@@ -12,7 +12,7 @@ class Conexion
    * Summary of pdo
    * @var PDO
    */
-  public static $pdo = null;
+  public static ?PDO $pdo = null;
 
   private function __construct()
   {
