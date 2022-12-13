@@ -60,6 +60,7 @@ $alert = [];
  */
 if (isset($_POST["agregarClientes"])) {
   $apellido_nombre = procesarInput($_POST["apellido_nombre"]);
+  // falta validar el email
   $email = procesarInput($_POST["email"]);
   $dni = procesarInput($_POST["dni"]);
   $movil = procesarInput($_POST["movil"]);

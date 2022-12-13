@@ -47,7 +47,7 @@ function setAlertEliminar(bool $response, int $id, int $pasillo): array
       "status" => "success"
     ]
     : [
-      "msg" => "No se pudo eliminar la amarra...",
+      "msg" => "No se pudo eliminar la amarra... Compruebe que no esté ocupada o se haya registrado algún movimiento con ella.",
       "strong" => "AVISO:",
       "status" => "danger"
     ];
@@ -68,16 +68,16 @@ if (isset($_POST["pasillo"])) {
  */
 if (isset($_POST["botonAmarras"]) && $seTipeoUnPasillo) {
 
-  $id = $_POST["idAmarra"];
+  $id = $_POST["idAmarra"] ?? 0;
   $pasillo = $_POST["pasillo"];
-  // Si se cambió el estado que lo cambie, sino que por defecto siga siendo 0 (libre)
-  $estado = isset($_POST["estado"]) ? $_POST["estado"] : 0;
+  // Por defecto que siga siendo 0 (libre)
+  $estado = $_POST["estado"] ?? 0;
 
   $amarra = new Amarra($id, $pasillo, $estado);
 
   if ($_POST["botonAmarras"] == "Agregar") {
     $alert["res"] = $amarra->insertAmarra();
-    $alert["res"] = setAlertAgregar($alert["res"], $id, $pasillo);
+    $alert["res"] = setAlertAgregar($alert["res"], $amarra->id(), $pasillo);
   } elseif ($_POST["botonAmarras"] == "Editar") {
     $alert["res"] = $amarra->updateAmarra();
     $alert["res"] = setAlertEditar($alert["res"], $id, $pasillo);

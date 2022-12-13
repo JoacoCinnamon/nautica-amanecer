@@ -49,9 +49,9 @@
 
 
         <div class="form-floating mb-3">
-          <select class="form-select" aria-label="selectClientes" name="idCliente" id="idCliente">
-            <option value="0">Seleccione el dueño...</option>
-            <?php $clientes = Cliente::selectClientesByEstado(1); ?>
+          <?php $clientes = Cliente::selectClientesByEstado(1); ?>
+          <select class="form-select" aria-label="selectClientes" name="idCliente" id="idCliente" <?php if (!$clientes) print "disabled";  ?>>
+            <option value="0"><?= (!$clientes) ? "No hay clientes aún..." : "Seleccione el dueño..." ?></option>
             <?php foreach ((array) $clientes as $clienteActual) : ?>
               <option value="<?= $clienteActual->id; ?>" <?php if ($id_cliente == $clienteActual->id) print "selected";
                                                           ?>>

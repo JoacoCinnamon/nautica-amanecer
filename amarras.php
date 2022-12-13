@@ -71,13 +71,11 @@
           </div>
 
           <div class="input-group">
-            <select class="form-select" id="idAmarra" name="idAmarra">
-              <option value="0">Lista de amarras</option>
-              <?php
-              $amarras = Amarra::selectAllAmarras();
-              foreach ((array) $amarras as $amarraActual) :
-                $estadoString = getEstadoToString($amarraActual);
-              ?>
+            <?php $amarras = Amarra::selectAllAmarras(); ?>
+            <select class="form-select" id="idAmarra" name="idAmarra" <?php if (!$amarras) print "disabled"; ?>>
+              <option value="0"><?= (!$amarras) ? "No hay amarras aún..." : "Lista de amarras"; ?></option>
+              <?php foreach ((array) $amarras as $amarraActual) : ?>
+                <?php $estadoString = getEstadoToString($amarraActual); ?>
                 <option value="<?= $amarraActual->id; ?>" <?php if ($id == $amarraActual->id) print "selected"; ?>>
                   <?= "N°$amarraActual->id - Pasillo $amarraActual->pasillo - Estado: ($estadoString)" ?> </option>
               <?php endforeach ?>

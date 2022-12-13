@@ -28,9 +28,9 @@ class Amarra
   {
     try {
       // Si esta amarra actualmente está ocupada
-      if (Movimiento::selectOcupado($this->id)) {
-        return false;
-      }
+      if (Movimiento::selectOcupado($this->id)) return false;
+      if (Movimiento::selectAmarrasRecord($this->id)) return false;
+
 
       $sentencia = "DELETE FROM `amarras` WHERE id = :id";
       $delete = Conexion::getConexion()->prepare($sentencia);
@@ -178,7 +178,12 @@ class Amarra
     }
   }
 
-  public function __construct($id, $pasillo, $estado)
+  public function id()
+  {
+    return $this->id;
+  }
+
+  public function __construct(int $id, int $pasillo, int $estado)
   {
     $this->id = $id;
     $this->pasillo = $pasillo;

@@ -112,7 +112,7 @@ class Movimiento
    * Consulta a la DB con el id de la amarra pasada por parámetro para obtener
    * si está ocupada actualmente 
    *
-   * @param integer $id_amarra Id de la embarcacion que deseamos saber desde cuando y donde está embarcada
+   * @param integer $id_amarra Id de la amarra que deseamos saber desde cuando y donde está embarcada
    * @return Movimiento|boolean
    */
   public static function selectOcupado(int $id_amarra)
@@ -123,6 +123,26 @@ class Movimiento
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetch();
+    } catch (PDOException $e) {
+      echo "ERROR: " . $e->getMessage();
+      die();
+    }
+  }
+
+  /**
+   * Consulta a la DB con el id de la amarra pasada por parámetro para obtener
+   * todos los registros de esa amarra
+   *
+   * @param integer $id_amarra Id de la amarra que deseamos saber desde cuando y donde está embarcada   
+   * @return array<Movimiento>|Movimiento|boolean
+   */
+  public static function selectAmarrasRecord(int $id_amarra)
+  {
+    try {
+      $sentencia = "SELECT * FROM `embarcacion-amarra` WHERE `id_amarra` = $id_amarra";
+      $select = Conexion::getConexion()->query($sentencia);
+
+      return $select->fetchAll();
     } catch (PDOException $e) {
       echo "ERROR: " . $e->getMessage();
       die();
@@ -174,7 +194,7 @@ class Movimiento
   public static function selectAllMovimientos(): array
   {
     try {
-      $sentencia = "SELECT * FROM `embarcacion-amarra` ORDER BY fecha_desde DESC, fecha_hasta ASC"; // ID DESC
+      $sentencia = "SELECT * FROM `embarcacion-amarra` ORDER BY fecha_hasta ASC"; // ID DESC
       $select = Conexion::getConexion()->query($sentencia);
 
       return $select->fetchAll();
